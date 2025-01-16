@@ -1,8 +1,8 @@
-// import "./All.css";
-// interface CheckMailProps {
-//     email: string;
-//     onSkip: () => void;
-//   }
+import "./All.css";
+interface CheckMailProps {
+    email: string;
+    onSkip: () => void;
+  }
 
 function CheckMail() {
   return (
