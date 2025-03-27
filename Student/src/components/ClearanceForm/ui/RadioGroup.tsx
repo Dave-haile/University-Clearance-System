@@ -1,5 +1,5 @@
-import { forwardRef } from 'react';
-import { clsx } from 'clsx';
+import { forwardRef } from "react";
+import { clsx } from "clsx";
 
 interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
@@ -11,9 +11,12 @@ interface RadioGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
-  ({ label, error, options, name, onChange, value, className, ...props }, ref) => {
+  (
+    { label, error, options, name, onChange, value, className, ...props },
+    ref
+  ) => {
     return (
-      <div ref={ref} className={clsx('w-full', className)} {...props}>
+      <div ref={ref} className={clsx("w-full", className)} {...props}>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label} {props.required && <span className="text-red-500">*</span>}
         </label>

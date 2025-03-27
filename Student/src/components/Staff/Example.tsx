@@ -1,7 +1,6 @@
 // Install necessary dependencies before starting:
 // npm install react-hook-form zod supabase @supabase/supabase-js tailwindcss postcss autoprefixer
 // Set up TailwindCSS according to the documentation.
-import { supabase } from '../supabaseClient';
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,7 +8,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  name: z.string().min(1, 'This name field is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -22,21 +21,7 @@ const LoginExample: React.FC = () => {
   });
 
   const onSubmit = async (data: LoginFormInputs) => {
-    const { email } = data;
-
-    if (email.endsWith('@InuCls.com')) {
-      // Redirect to Change Email and Password page
-      window.location.href = '/change-credentials';
-    } else {
-      // Send verification email via Supabase
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) {
-        alert('Error sending verification email: ' + error.message);
-      } else {
-        // Redirect to Verify Email page
-        window.location.href = '/verify-email';
-      }
-    }
+    console.log(data)
   };
 
   return (
@@ -49,17 +34,17 @@ const LoginExample: React.FC = () => {
           Toggle {darkMode ? 'Light' : 'Dark'} Mode
         </button>
 
-        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-center">Staff Account Create</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+            <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
             <input
-              id="email"
-              type="email"
-              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-              {...register('email')}
+              id="name"
+              type="text"
+              className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+              {...register('name')}
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
           </div>
 
           <div className="mb-4">

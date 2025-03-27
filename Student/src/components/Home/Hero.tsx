@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
 export default function Hero() {
+  const navigator = useNavigate()
   return (
     <div className="pt-24 pb-16 bg-gradient-to-br from-blue-50 to-white">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
@@ -10,7 +13,9 @@ export default function Hero() {
             Say goodbye to manual paperwork! Our digital clearance system streamlines
             the process for students, staff, and administrators.
           </p>
-          <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors shadow-lg">
+          <button onClick={()=>{
+            navigator('/StudentForm')
+          }} className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors shadow-lg">
             Get Started
           </button>
         </div>

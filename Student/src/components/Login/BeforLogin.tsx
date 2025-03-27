@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import Login from './Login';
 
-export const AccountReminder = ({handleOkayClick}) => {
+interface AccountReminderProps {
+  handleOkayClick: () => void;
+}
+
+export const AccountReminder = ({handleOkayClick}: AccountReminderProps) => {
 
   
 

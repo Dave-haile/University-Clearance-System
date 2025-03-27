@@ -11,3 +11,7 @@ body {
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+:root{
+    --primary-color: #115DFC;
+    --primary-color-hover: #235ede;
+}

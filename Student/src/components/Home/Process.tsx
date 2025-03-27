@@ -1,7 +1,4 @@
-import React from 'react';
 import { LogIn, Send, Activity, CheckCircle } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
-
 const steps = [
   {
     icon: LogIn,
@@ -49,7 +46,6 @@ export default function Process() {
           ))}
         </div>
       </div>
-      <Outlet/>
     </section>
   );
 }

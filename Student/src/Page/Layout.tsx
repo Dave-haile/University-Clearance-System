@@ -7,7 +7,7 @@ export function Container() {
     <div>
       <Header />
       <main>
-        <Outlet /> {/* This is where the nested routes will be rendered */}
+        <Outlet /> 
       </main>
       <Footer />
     </div>

@@ -1,4 +1,4 @@
-import "./All.css";
+
 interface CheckMailProps {
     email: string;
     onSkip: () => void;
