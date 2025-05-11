@@ -5,12 +5,12 @@ const axiosClient = axios.create({
   headers: {
     "Content-Type": "application/json",
     "Accept": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("ACCESS")}`,
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
 });
 
 axiosClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("ACCESS");
+  const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -22,7 +22,9 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.log("Unauthorized! Clearing token...");
-      localStorage.removeItem("ACCESS");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

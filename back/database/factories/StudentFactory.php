@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -16,33 +17,18 @@ class StudentFactory extends Factory
      * @return array<string, mixed>
      */
     public function definition(): array
-    {
-        $randId = rand(0000, 10000);
-        $randYear = rand(10, 17);
-        $studentId = 'INUSR/' . $randId . '/' . $randYear;
-        return [
-            'user_id' => User::factory()->state(['role' => 'student']), // Create user with student role
-            'student_id' => $studentId,
-            'department' => $this->faker->unique()->randomElement([
-                'Computer Science',
-                'Software Engineering',
-                'Information Systems',
-                'Electrical Engineering',
-                'Mechanical Engineering',
-                'Civil Engineering',
-                'Biomedical Engineering',
-                'Physics',
-                'Mathematics',
-                'Data Science'
-            ]),
-            'year' => $this->faker->randomElement([
-                '1st year',
-                '2nd year',
-                '3rd year',
-                '4th year',
-                '5th year',
-                '6th year',
-            ])
-        ];
-    }
+{
+    $randId = rand(1000, 9999);
+    $randYear = rand(10, 25);
+    $studentId = 'INUSR/' . $randId . '/' . $randYear;
+
+    return [
+        'user_id' => User::factory()->student(),
+        'student_id' => $studentId,
+        'department_id' => Department::inRandomOrder()->first()?->id ?? Department::factory(),
+        'year' => $this->faker->randomElement([
+            '1st Year', '2nd Year', '3rd Year', '4th Year'
+        ]),
+    ];
+}
 }

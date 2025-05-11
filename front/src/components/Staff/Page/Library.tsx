@@ -11,11 +11,10 @@ const LibraryApproval = () => {
     const handleApproval = async (id: number) => {
         try {
             await axiosClient.post(`/approve-clearance/${id}`, {
-                staff_role: "library",
+                staff_role: "department_head",
                 status,
                 remarks,
             });
-
             fetchClearanceRequests(); 
         } catch (error) {
             console.error("Error updating clearance", error);

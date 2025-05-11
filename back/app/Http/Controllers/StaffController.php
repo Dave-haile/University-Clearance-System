@@ -22,9 +22,7 @@ class StaffController extends Controller
             'department' => 'required_if:role,department_head|string',
         ]);
 
-        // Handle department head case
         if ($validated['role'] === 'department_head') {
-            // Ensure the department exists in the database
             $department = Department::where('department', $validated['department'])
                 ->where('college', $validated['college'])
                 ->first();
@@ -33,7 +31,6 @@ class StaffController extends Controller
                 throw ValidationException::withMessages(['department' => 'Department not found in the selected college.']);
             }
 
-            // Ensure only ONE department head exists per department
             $existingHead = Staff::where('role', 'department_head')
                 ->where('department_id', $department->id)
                 ->first();
@@ -44,7 +41,7 @@ class StaffController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'role' => 'staff',
+                'role' => $validated['role'],
                 'password' => Hash::make($validated['password']),
             ]);
             $staff = Staff::create([
@@ -57,10 +54,9 @@ class StaffController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'role' => 'staff',
+                'role' => $validated['role'],
                 'password' => Hash::make($validated['password']),
             ]);
-            // Create staff record for other roles (library, cafeteria)
             $staff = Staff::create([
                 'user_id' => $user->id,
                 'position' => ucfirst($validated['role']) . ' Staff', // Example: "Library Staff"
@@ -75,7 +71,7 @@ class StaffController extends Controller
     }
     public function show()
     {
-        $department = Department::all();
-        return response()->json($department,);
+        $department = Department::with('departmentHead.user')->get();
+        return response()->json($department);
     }
 }

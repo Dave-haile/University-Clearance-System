@@ -17,7 +17,7 @@ class Staff extends Model
         return $this->belongsTo(User::class);
     }
     public function department()
-{
-    return $this->belongsTo(Department::class);
-}
+    {
+        return $this->belongsTo(Department::class);
+    }
 }

@@ -8,11 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Department extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['department', 'college'];
 
-    public function staff()
+    public function departmentHead()
     {
-        return $this->hasMany(Staff::class);
+        return $this->hasOne(Staff::class)->where('role', 'department_head');
+    }
+    public function students()
+    {
+        return $this->hasMany(Student::class);
     }
 }

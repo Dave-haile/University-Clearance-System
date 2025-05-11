@@ -1,24 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import { useStateContext } from "../../context/context";
+import { useAuth } from "../../context/authContext";
 import axiosClient from "../../services/axiosBackend";
-import axios from "axios";
+import { LoginFormInputs, loginSchema } from "../../types/user";
+import { notifyError } from "../../hooks/toast";
 
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormInputs = z.infer<typeof loginSchema>;
-
-const LoginExample: React.FC = () => {
+const Login: React.FC = () => {
   const [darkMode, setDarkMode] = useState(false);
   const navigator = useNavigate();
   const [loading, setLoading] = useState(false);
-  const { token, setUsers, setToken } = useStateContext();
+  const { login, token, user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -29,28 +22,48 @@ const LoginExample: React.FC = () => {
   });
   useEffect(() => {
     if (token) {
-      navigator("/");
+      if (user?.role === "admin") navigator("/admin");
+      else if (user?.role === "student") navigator("/student");
+      else navigator("/staff");
     }
-  }, [token, navigator]);
+  }, [token, navigator, user]);
 
   const onSubmit = async (data: LoginFormInputs) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await axiosClient.post("/login", data);
-      setUsers(response.data.user);
-      setToken(response.data.token);
-      navigator("/");
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setError("root", {
-          message: error.response?.data?.message || "An error occurred",
+      const user = response.data.user;
+      const token = response.data.token;
+      login(user, token);
+      if (user?.role === "admin") {
+        navigator("/admin/Dashbord", {
+          state: { message: `Welcome back, admin!` },
         });
-      } else {
-        setError("root", { message: "An error occurred" });
+      } else if (user?.role === "student") {
+        navigator("/student", {
+          state: { message: `Welcome back, student!` },
+        });
+      } else if (
+        [
+          "department_head",
+          "library",
+          "cafeteria",
+          "registrar",
+          "proctor",
+        ].includes(user?.role ?? "")
+      ) {
+        navigator("/staff", {
+          state: { message: `Welcome back, member!` },
+        });
       }
-      console.log(error);
-    } finally{
-      setLoading(false)
+    } catch (error) {
+      notifyError("Login failed. Please check your credentials.");
+      console.error("Login error:", error);
+      setError("root", {
+        message: "Login failed. Please check your credentials.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,13 +94,13 @@ const LoginExample: React.FC = () => {
               id="Username"
               type="text"
               className={`w-full p-2 border rounded-md focus:outline-none focus:ring-2 ${
-                errors.username ? "border-red-500" : "border-gray-300"
+                errors.login ? "border-red-500" : "border-gray-300"
               }`}
-              {...register("username")}
+              {...register("login")}
             />
-            {errors.username && (
+            {errors.login && (
               <p className="text-red-500 text-sm mt-1">
-                {errors.username.message}
+                {errors.login.message}
               </p>
             )}
           </div>
@@ -122,14 +135,14 @@ const LoginExample: React.FC = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
           {errors.root && (
-              <p className="text-red-500 text-center py-2 text-[1.1rem] mt-1">
-                {errors.root.message}
-              </p>
-            )}
+            <p className="text-red-500 text-center py-2 text-[1.1rem] mt-1">
+              {errors.root.message}
+            </p>
+          )}
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginExample;
+export default Login;

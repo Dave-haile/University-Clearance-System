@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateStudentRequest;
 use App\Http\Requests\LoginRequest;
+use App\Models\Department;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,38 +19,54 @@ class AuthController extends Controller
 {
     public function Signup(CreateStudentRequest $request)
     {
+        logger($request);
         $validated = $request->validated();
+
         $name = ucwords($validated['name']);
         $nameParts = explode(" ", $name);
         $password = $nameParts[0] . rand(1000, 9999);
         $fakeUserName = str_replace('/', '', $validated['student_id']);
+        $department = Department::where('department', $validated['department'])->first();
+        logger($department->department);
+        logger($department->college);
+        logger($department->id);    
 
+        if (!$department) {
+            return response()->json([
+                'error' => 'Department not found: ' . $validated['department']
+            ], 422);
+        }
         $user = User::create([
-            'name' => $validated['name'],
+            'name' => $name,
             'username' => $fakeUserName,
             'password' => Hash::make($password),
             'role' => 'student'
         ]);
+
+        logger($user);
         Student::create([
             'user_id' => $user->id,
             'student_id' => $validated['student_id'],
-            'department' => $validated['department'],
+            'department_id' => $department->id,
             'year' => $validated['year']
         ]);
+        logger($user->student);
+
         return response()->json([
-            'message' => 'Student ' . $user['name'] . ' created successfully',
+            'message' => 'Student ' . $user->name . ' created successfully',
             'username' => $fakeUserName,
             'password' => $password
         ]);
     }
     public function login(LoginRequest $request)
     {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
+        $request->validated();
 
-        $user = User::where('username', $request->username)->first();
+        $credentals = $request->only('login', 'password');
+        $field = filter_var($credentals['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $user = User::where([
+            $field => $credentals['login']
+        ], $request->username)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'message' => 'Bad Credentials'
@@ -135,7 +152,7 @@ class AuthController extends Controller
                 'updated_at' => now(),
             ];
             return response()->json([
-                'message' => 'Student Account is Created For '. $students['name'],
+                'message' => 'Student Account is Created For ' . $students['name'],
                 'students' => $students
             ]);
         }

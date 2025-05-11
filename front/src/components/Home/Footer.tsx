@@ -37,8 +37,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link to={'/profile'} className="hover:text-blue-400">
-                    Terms of Service
+                  <Link to={'/admin/Dashbord'} className="hover:text-blue-400">
+                  Profile
                   </Link>
                 </li>
                 <li>

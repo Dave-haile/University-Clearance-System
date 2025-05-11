@@ -1,24 +1,15 @@
 import { GraduationCap, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useStateContext } from "../../context/context";
+import { useAuth } from "../../context/authContext";
 import DarkMode from "./DarkMode";
-import axiosClient from "../../services/axiosBackend";
 import { useState } from "react";
 
 export default function Header() {
-  const { users, token } = useStateContext();
-  const [message, setMessage] = useState()
-  const text = users?.name;
+  const { token,user } = useAuth();
+  const [message, setMessage] = useState();
+  const text = user?.name;
   const username = text?.split(" ")[0];
-  const logOut = ()=>{
-    axiosClient.post('/logout').then((response)=>{
-      setMessage(response.data.message)
-      console.log(response.data)
-      console.log(message)
-      localStorage.removeItem("ACCESS");
-      location.reload();
-    })
-  }
+  const {logout} = useAuth();
   return (
     <>
       <header className="fixed w-full bg-white top-0 shadow-sm z-50">
@@ -47,7 +38,12 @@ export default function Header() {
                 <span className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors capitalize">
                   {username}
                 </span>
-                <span onClick={logOut} className=" text-red-700 border-red-700 border-[3px] px-6 py-2 rounded-full hover:bg-red-500 hover:text-white hover:border-red-600 transition-colors hover:cursor-pointer">
+                <span
+                  onClick={() => {
+                    logout();
+                  }}
+                  className=" text-red-700 border-red-700 border-[3px] px-6 py-2 rounded-full hover:bg-red-500 hover:text-white hover:border-red-600 transition-colors hover:cursor-pointer"
+                >
                   Logout
                 </span>
               </>

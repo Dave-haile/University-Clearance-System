@@ -17,7 +17,7 @@ import { RadioGroup } from "./ui/RadioGroup";
 import { TextArea } from "./ui/TextArea";
 import axiosClient from "../../services/axiosBackend";
 import axios from "axios";
-import { useStateContext } from "../../context/context";
+import { useAuth } from "../../context/authContext";
 
 function ClearanceForm2() {
   const {
@@ -36,7 +36,7 @@ function ClearanceForm2() {
   const selectedReason = watch("reason_for_clearance");
   const departments =
     colleges.find((c) => c.name === selectedCollege)?.departments || [];
-  const { users } = useStateContext();
+  const { user } = useAuth();
   const date = new Date().getFullYear();
 
   const onSubmit = async (formData: ClearanceFormData) => {
@@ -81,7 +81,7 @@ function ClearanceForm2() {
           {...register("first_name")}
           error={errors.first_name?.message}
           disabled={true}
-          value={users?.name}
+          value={user?.name}
         />
 
         <Select
@@ -100,7 +100,7 @@ function ClearanceForm2() {
           required
           {...register("id_number")}
           error={errors.id_number?.message}
-          value={users?.student?.student_id}
+          value={user?.student?.student_id}
         />
 
         <Select

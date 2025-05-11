@@ -30,7 +30,11 @@ class ClearanceRequestController extends Controller
             return response()->json(['message' => 'Sex field is required'], 400);
         }
 
-        if (ClearanceRequest::where('student_id', $student_id)->where('status', 'pending')->exists()) {
+        if (ClearanceRequest::where('student_id', $student_id)
+            ->where('status', 'pending')
+            ->where('archived', false)
+            ->exists()
+        ) {
             return response()->json(['message' => 'You already have a pending clearance request'], 400);
         }
 
@@ -48,6 +52,7 @@ class ClearanceRequestController extends Controller
             'reason_for_clearance' => $validatedData['reason_for_clearance'],
             'cafe_status' => $validatedData['cafe_status'],
             'dorm_status' => $validatedData['dorm_status'],
+            'archived' => false
         ]);
 
         return response()->json([
@@ -116,7 +121,7 @@ class ClearanceRequestController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
-$clearanceRequest = ClearanceRequest::findOrFail($id);
+        $clearanceRequest = ClearanceRequest::findOrFail($id);
 
         // Retrieve existing approvals or initialize an empty array
         $approvals = $clearanceRequest->approvals ?? [];
@@ -155,8 +160,9 @@ $clearanceRequest = ClearanceRequest::findOrFail($id);
 
         return response()->json(["message" => "Clearance updated successfully"]);
     }
-    public function display(){
+    public function display()
+    {
         $clearanceRequests = ClearanceRequest::all();
-        return response()->json($clearanceRequests->load(['student','student.user']));
+        return response()->json($clearanceRequests->load(['student', 'student.user']));
     }
 }
