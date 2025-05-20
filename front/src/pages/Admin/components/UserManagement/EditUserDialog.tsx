@@ -295,8 +295,8 @@
 
 // export default EditUserDialog;
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Button } from "../ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../../../components/ui/dialog";
+import { Button } from "../../../../components/ui/button";
 import { useToast } from "../../hooks/use-toast";
 import UserDetailsDisplay from "./UserDetailsDisplay";
 import ResetAccountForm from "./ResetAccountForm";

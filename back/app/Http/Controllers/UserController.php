@@ -34,4 +34,25 @@ class UserController extends Controller
                 : null,
         ]);
     }
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->name = $request->name;
+        $user->username = $request->username;
+
+        if ($request->filled('email')) {
+            $user->email = $request->email;
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'Profile updated successfully']);
+    }
 }

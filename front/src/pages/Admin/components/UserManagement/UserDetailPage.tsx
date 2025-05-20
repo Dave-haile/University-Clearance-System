@@ -3,14 +3,14 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { fetchUserDetail, deleteUser } from "../../services/userDetailService";
 import { ArrowLeft, Shield, UserMinus } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../ui/card";
+} from "../../../../components/ui/card";
 import { formatDate } from "../../utils/formatDate";
 import ClearanceRequestsList from "./ClearanceRequestsList";
 // import EditUserInfoDialog from "./EditUserInfoDialog";

@@ -4,12 +4,11 @@ import FilterSection from "../components/ClearanceManagemnt/FilterSection";
 import LoadingSpinner from "../components/ClearanceManagemnt/LoadingSpinner";
 import ErrorAlert from "../components/ClearanceManagemnt/ErrorAlert";
 import EmptyState from "../components/ClearanceManagemnt/EmptyState";
-import { Button } from "../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import { ClearanceRequests } from "../../../types/clerance";
 import ClearanceTable from "../components/ClearanceManagemnt/ClearanceTable";
 import axiosClient from "../../../services/axiosBackend";
 import MainLayout from "../components/layout/MainLayout";
-import { notifySuccess } from "../../../hooks/toast";
 import { Archive } from "lucide-react";
 import {
   AlertDialog,
@@ -20,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../components/ui/alert-dialog";
+} from "../../../components/ui/alert-dialog";
 import { toast } from "sonner";
 
 const Requests = () => {
@@ -52,7 +51,6 @@ const Requests = () => {
       setClearanceRequests(data.data);
       setTotalPages(Math.ceil(data.data.length / itemsPerPage));
       setIsLoading(false);
-      notifySuccess("Clearance Requestes Fetched Successfully");
     } catch (err) {
       setIsLoading(false);
       setError("Failed to load clearance requests. Please try again.");
@@ -73,7 +71,7 @@ const Requests = () => {
     }
     if (departmentFilter !== "all") {
       filtered = filtered.filter(
-        (request) => request.department === departmentFilter
+        (request) => request.department.department === departmentFilter
       );
     }
     if (searchQuery.trim() !== "") {
@@ -118,7 +116,7 @@ const Requests = () => {
   };
   return (
     <MainLayout>
-      <div className="container mx-auto px-1 py-2">
+      <div className="mx-auto px-1 py-2">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-0">
             Clearance Request Monitoring

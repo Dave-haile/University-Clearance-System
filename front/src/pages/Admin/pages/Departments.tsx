@@ -2,7 +2,7 @@ import React from "react";
 import { RefreshCwIcon } from "lucide-react";
 import { DepartmentTable } from "../components/DepartmentManagement/DepartmentTablelove";
 import { useDepartmentManager } from "../hooks/useDepartmentManager";
-import { Button } from "../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import { DepartmentFilters } from "../components/DepartmentManagement/DepartmentFilterslove";
 import { DepartmentPagination } from "../components/DepartmentManagement/DepartmentPagination";
 import { EditDepartmentModal } from "../components/DepartmentManagement/EditDepartmentModal";
@@ -51,7 +51,7 @@ const Departments: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className=" mx-auto py-2">
+      <div className="mx-auto py-2">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Department Management</h1>

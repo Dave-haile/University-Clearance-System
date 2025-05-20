@@ -7,14 +7,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table";
-import { Button } from "../ui/button";
+} from "../../../../components/ui/table";
+import { Button } from "../../../../components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../ui/tooltip";
+} from "../../../../components/ui/tooltip";
 import { Department, DepartmentStat } from "../../../../types/department";
 import { EditIcon, Trash2Icon } from "lucide-react";
 

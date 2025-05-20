@@ -60,11 +60,11 @@ class DatabaseSeeder extends Seeder
             'user_id' => $adminUser->id,
             'admin_code' => 'ADMIN001'
         ]);
-        User::factory(10)->create();
+        User::factory(5)->create();
 
-        Student::factory(20)->create();
+        Student::factory(15)->create();
 
-        Staff::factory(10)->create();
+        Staff::factory(6)->create();
 
         ClearanceRequest::factory(15)->create();
     }

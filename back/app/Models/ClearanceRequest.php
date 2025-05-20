@@ -10,32 +10,36 @@ class ClearanceRequest extends Model
     use HasFactory;
     protected $fillable = [
         'student_id',
-        'department',
+        'department_id',
         'year',
         'status',
         'comment',
         'semester',
         'section',
-        'college',
         'academic_year',
         'last_day_class_attended',
         'reason_for_clearance',
         'cafe_status',
         'dorm_status',
-        'department_head_approved', 
-        'library_approved', 
-        'cafeteria_approved', 
-        'proctor_approved', 
+        'department_head_approved',
+        'library_approved',
+        'cafeteria_approved',
+        'proctor_approved',
         'registrar_approved',
-        'current_step', 
+        'current_step',
         'sex',
         'approvals'
+
     ];
     protected $casts = [
         'approvals' => 'array'
     ];
     public function student()
     {
-        return $this->belongsTo(Student::class,'student_id', 'student_id');
+        return $this->belongsTo(Student::class, 'student_id', 'student_id');
+    }
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }

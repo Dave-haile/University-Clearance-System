@@ -1,8 +1,8 @@
 
 import React from "react";
 import { User } from "../../../../types/user";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Label } from "../../../../components/ui/label";
+import { Input } from "../../../../components/ui/input";
 import { formatDate } from "../../utils/formatDate";
 
 interface UserDetailsDisplayProps {

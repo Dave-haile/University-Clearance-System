@@ -3,13 +3,13 @@ import MainLayout from "../components/layout/MainLayout";
 import { RefreshCcw } from "lucide-react";
 import axiosClient from "../../../services/axiosBackend";
 import { DashboardData } from "../../../types/dashboard";
-import { Button } from "../components/ui/button";
+import { Button } from "../../../components/ui/button";
 import SummaryCard from "../components/DashboardManagment/SummaryCard";
 import RequestsBarChart from "../components/DashboardManagment/RequestsBarChart";
 import DepartmentPieChart from "../components/DashboardManagment/DepartmentPieChart";
 import MonthlyTrendsChart from "../components/DashboardManagment/MonthlyTrendsChart";
 import StaffRolesCard from "../components/DashboardManagment/StaffRolesCard";
-import { notifyError, notifySuccess } from "../../../hooks/toast";
+import { notifyError } from "../../../hooks/toast";
 import RecentRequestsTable from "../components/DashboardManagment/RecentRequestsTable";
 
 const Dashboard = () => {
@@ -29,11 +29,11 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await axiosClient.get("/admin/dashboard");
+      console.log(response.data);
       setData(response.data);
       setLoading(false);
-      notifySuccess("Data is Fetched Successfully");
     } catch (error) {
-      notifyError(`Error fetching dashboard data: ${error}`);
+      notifyError(`Error fetching dashboard data: ${error.response.data.message}`);
       console.error("Error fetching dashboard data:", error);
       setLoading(false);
     }
@@ -129,9 +129,6 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <StaffRolesCard roles={data?.staffRoles} />
-            <MonthlyTrendsChart data={data?.byMonth} />
-          </div>
-          <div>
             <MonthlyTrendsChart data={data?.byMonth} />
           </div>
           <div className="mt-10">

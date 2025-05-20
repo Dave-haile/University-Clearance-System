@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "../ui/dialog";
+} from "../../../../components/ui/dialog";
 
 import { useToast } from "../../hooks/use-toast";
 
@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { ArrowLeft } from "lucide-react";
-import CreateStaff from "../../CreateAccount";
+import CreateStaff from "./CreateAccount";
 import StudentRegistration from "../../../../components/Staff/components/StudentAccountCreation";
 
 type UserType = "student" | "staff";

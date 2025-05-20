@@ -19,4 +19,8 @@ class Department extends Model
     {
         return $this->hasMany(Student::class);
     }
+    public function clearanceRequests()
+    {
+        return $this->hasMany(ClearanceRequest::class);
+    }
 }

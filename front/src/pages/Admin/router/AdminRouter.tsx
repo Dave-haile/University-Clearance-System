@@ -9,13 +9,13 @@ import UserDetailPage from "../components/UserManagement/UserDetailPage";
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route path="admin" element={<Dashboard />} />
-      <Route path="admin/Dashbord" element={<Dashboard />} />
-      <Route path="admin/settings" element={<Settings />} />
-      <Route path="admin/users" element={<Users />} />
-      <Route path="/admin/users/:id" element={<UserDetailPage />} />
-      <Route path="admin/requests" element={<Requests />} />
-      <Route path="admin/departments" element={<Departments />} />
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/Dashbord" element={<Dashboard />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/users" element={<Users />} />
+      <Route path="/users/:id" element={<UserDetailPage />} />
+      <Route path="/requests" element={<Requests />} />
+      <Route path="/departments" element={<Departments />} />
     </Routes>
   );
 };

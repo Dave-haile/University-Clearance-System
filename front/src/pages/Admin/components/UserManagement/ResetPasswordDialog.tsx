@@ -6,10 +6,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+} from "../../../../components/ui/dialog";
+import { Button } from "../../../../components/ui/button";
+import { Label } from "../../../../components/ui/label";
+import { Input } from "../../../../components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { Key, Eye } from "lucide-react";
 import { User } from "../../../../types/index";

@@ -39,19 +39,20 @@ class AdminController extends Controller
             'total_student' => $totalStudent,
             'total_colleges' => $totalColleges,
             'totals' => [
-                'all' => ClearanceRequest::count(),
-                'approved' => ClearanceRequest::where('status', 'approved')->count(),
-                'pending' => ClearanceRequest::where('status', 'pending')->count(),
-                'rejected' => ClearanceRequest::where('status', 'rejected')->count(),
+                'all' => ClearanceRequest::where('archived', false)->count(),
+                'approved' => ClearanceRequest::where('status', 'approved')->where('archived', false)->count(),
+                'pending' => ClearanceRequest::where('status', 'pending')->where('archived', false)->count(),
+                'rejected' => ClearanceRequest::where('status', 'rejected')->where('archived', false)->count(),
             ],
-            'byDepartment' => ClearanceRequest::select('department', DB::raw('count(*) as total'))
-                ->groupBy('department')
+            'byDepartment' => ClearanceRequest::where('archived', false)->join('departments', 'clearance_requests.department_id', '=', 'departments.id')
+                ->select('departments.department as department', DB::raw('count(*) as total'))
+                ->groupBy('departments.department')
                 ->get(),
-            'byMonth' => ClearanceRequest::selectRaw("TO_CHAR(created_at, 'YYYY-MM') as month, count(*) as total")
+            'byMonth' => ClearanceRequest::where('archived', false)->selectRaw("TO_CHAR(created_at, 'YYYY-MM') as month, count(*) as total")
                 ->groupBy('month')
                 ->orderBy('month')
                 ->get(),
-            'recentRequests' => ClearanceRequest::with('student.user')->latest()->take(5)->get(),
+            'recentRequests' => ClearanceRequest::where('archived', false)->with('student.user')->latest()->take(5)->get(),
             'staffRoles' => [
                 'department_head' => $counts['department_head'] ?? 0,
                 'library' => $counts['library'] ?? 0,
@@ -141,17 +142,17 @@ class AdminController extends Controller
         return response()->json([
             'message' => 'Department created successfully',
             'department' => $department,
-            'user' => $user,$staff
+            'user' => $user,
+            $staff
         ], 201);
     }
-    public function deleteDepartment() {
-        
-    }
+    public function deleteDepartment() {}
     public function displayRequests()
     {
         Auth::user();
-        $data = ClearanceRequest::where('archived', false)->get();
-        $data->load('student.user', 'student.department');
+        $data = ClearanceRequest::where('archived', false)
+        ->with('student.user','student.department','department')
+        ->get();
         return response()->json($data);
     }
     public function depart()
@@ -174,7 +175,8 @@ class AdminController extends Controller
     public function show($id)
     {
         $user = User::with('student.clearance_requests', 'student.department', 'staff.department')->findOrFail($id);
-        $clearances = ClearanceRequest::where('student_id', $user->student->student_id ?? null)->get();
+        $clearances = ClearanceRequest::where('student_id', $user->student->student_id ?? null)->
+        with('department')->get();
 
         return response()->json(compact('user', 'clearances'));
     }
@@ -227,7 +229,7 @@ class AdminController extends Controller
     }
     public function archiveClearanceRequests(Request $request)
     {
-        ClearanceRequest::where('archived', true)->update(['archived' => false]);
+        ClearanceRequest::where('archived', false)->update(['archived' => true]);
 
         return response()->json(['message' => 'All clearance requests archived successfully.']);
     }

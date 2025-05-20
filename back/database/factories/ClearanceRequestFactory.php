@@ -101,83 +101,120 @@ class ClearanceRequestFactory extends Factory
     //         'registrar_approved' => $approvals['registrar'],
     //     ];
     // }
+    // public function definition(): array
+    // {
+    //     $student = Student::inRandomOrder()->first();
+
+    //     $approvals = [
+    //         'department_head' => null,
+    //         'library' => null,
+    //         'cafeteria' => null,
+    //         'proctor' => null,
+    //         'registrar' => null,
+    //     ];
+
+    //     $outcome = $this->faker->randomElement([
+    //         'pending',
+    //         'pending',
+    //         'pending',
+    //         'pending',
+    //         'pending',
+    //         'pending',
+    //         'pending',
+    //         'approved',
+    //         'approved',
+    //         'rejected',
+    //     ]);
+
+    //     switch ($outcome) {
+    //         case 'approved':
+    //             foreach ($approvals as $step => $_) {
+    //                 $approvals[$step] = true;
+    //             }
+    //             break;
+
+    //         case 'rejected':
+    //             foreach ($approvals as $step => $_) {
+    //                 $approvals[$step] = true;
+    //                 if ($this->faker->boolean(30)) {
+    //                     $approvals[$step] = false;
+    //                     break;
+    //                 }
+    //             }
+    //             break;
+
+    //         case 'pending':
+    //             $steps = array_keys($approvals);
+    //             $completedSteps = $this->faker->numberBetween(0, 3);
+    //             for ($i = 0; $i < $completedSteps; $i++) {
+    //                 $approvals[$steps[$i]] = true;
+    //             }
+    //             break;
+    //     }
+
+    //     $status = in_array(false, $approvals)
+    //         ? 'rejected'
+    //         : (in_array(null, $approvals) ? 'pending' : 'approved');
+
+
+    //     return [
+    //         'student_id' => $student->student_id,
+    //         'sex' => $this->faker->randomElement(['Male', 'Female']),
+    //         'status' => $status,
+    //         'approvals' => json_encode($approvals),
+    //         'year' => $student->year,
+    //         'semester' => $this->faker->randomElement(['First', 'Second']),
+    //         'section' => $this->faker->randomElement(['A', 'B', 'C']),
+    //         'department' => $student->department->department,
+    //         'college' => $student->department->college,
+    //         'academic_year' => $this->faker->year() . '-' . ($this->faker->year() + 1),
+    //         'last_day_class_attended' => $this->faker->date(),
+    //         'reason_for_clearance' => $this->faker->sentence(),
+    //         'cafe_status' => $this->faker->randomElement(['cafe', 'non-cafe']),
+    //         'dorm_status' => $this->faker->randomElement(['dorm', 'non-dorm']),
+    //         'current_step' => collect($approvals)->search(null) ?: 'all_approved',
+    //         'department_head_approved' => $approvals['department_head'],
+    //         'library_approved' => $approvals['library'],
+    //         'cafeteria_approved' => $approvals['cafeteria'],
+    //         'proctor_approved' => $approvals['proctor'],
+    //         'registrar_approved' => $approvals['registrar'],
+    //     ];
+    // }
     public function definition(): array
-    {
-        $student = Student::inRandomOrder()->first();
+{
+    $student = Student::inRandomOrder()->first();
+    $department = $student->department;
 
-        $approvals = [
-            'department_head' => null,
-            'library' => null,
-            'cafeteria' => null,
-            'proctor' => null,
-            'registrar' => null,
-        ];
+    // Fresh request: no approvals yet
+    $approvals = [
+        'department_head' => null,
+        'library' => null,
+        'cafeteria' => null,
+        'proctor' => null,
+        'registrar' => null,
+    ];
 
-        $outcome = $this->faker->randomElement([
-            'pending',
-            'pending',
-            'pending',
-            'pending',
-            'pending',
-            'pending',
-            'pending',
-            'approved',
-            'approved',
-            'rejected',
-        ]);
+    return [
+        'student_id' => $student->student_id,
+        'sex' => $this->faker->randomElement(['Male', 'Female']),
+        'status' => 'pending',
+        // 'approvals' => json_encode($approvals),
+        'year' => $student->year,
+        'semester' => $this->faker->randomElement(['First', 'Second']),
+        'section' => $this->faker->randomElement(['A', 'B', 'C']),
+        'department_id' => $department->id,
+        'academic_year' => $this->faker->year() . '-' . ($this->faker->year() + 1),
+        'last_day_class_attended' => $this->faker->date(),
+        'reason_for_clearance' => $this->faker->sentence(),
+        'cafe_status' => $this->faker->randomElement(['cafe', 'non-cafe']),
+        'dorm_status' => $this->faker->randomElement(['dorm', 'non-dorm']),
+        'current_step' => 'department_head',
+        'department_head_approved' => null,
+        'library_approved' => null,
+        'cafeteria_approved' => null,
+        'proctor_approved' => null,
+        'registrar_approved' => null,
+    ];
+}
 
-        switch ($outcome) {
-            case 'approved':
-                foreach ($approvals as $step => $_) {
-                    $approvals[$step] = true;
-                }
-                break;
-
-            case 'rejected':
-                foreach ($approvals as $step => $_) {
-                    $approvals[$step] = true;
-                    if ($this->faker->boolean(30)) {
-                        $approvals[$step] = false;
-                        break;
-                    }
-                }
-                break;
-
-            case 'pending':
-                $steps = array_keys($approvals);
-                $completedSteps = $this->faker->numberBetween(0, 3);
-                for ($i = 0; $i < $completedSteps; $i++) {
-                    $approvals[$steps[$i]] = true;
-                }
-                break;
-        }
-
-        $status = in_array(false, $approvals)
-            ? 'rejected'
-            : (in_array(null, $approvals) ? 'pending' : 'approved');
-
-
-        return [
-            'student_id' => $student->student_id,
-            'sex' => $this->faker->randomElement(['Male', 'Female']),
-            'status' => $status,
-            'approvals' => json_encode($approvals),
-            'year' => $student->year,
-            'semester' => $this->faker->randomElement(['First', 'Second']),
-            'section' => $this->faker->randomElement(['A', 'B', 'C']),
-            'department' => $student->department->department,
-            'college' => $student->department->college,
-            'academic_year' => $this->faker->year() . '-' . ($this->faker->year() + 1),
-            'last_day_class_attended' => $this->faker->date(),
-            'reason_for_clearance' => $this->faker->sentence(),
-            'cafe_status' => $this->faker->randomElement(['cafe', 'non-cafe']),
-            'dorm_status' => $this->faker->randomElement(['dorm', 'non-dorm']),
-            'current_step' => collect($approvals)->search(null) ?: 'all_approved',
-            'department_head_approved' => $approvals['department_head'],
-            'library_approved' => $approvals['library'],
-            'cafeteria_approved' => $approvals['cafeteria'],
-            'proctor_approved' => $approvals['proctor'],
-            'registrar_approved' => $approvals['registrar'],
-        ];
-    }
 }

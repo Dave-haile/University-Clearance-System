@@ -1,9 +1,7 @@
-
-import { format } from "date-fns";
 import { Check } from "lucide-react";
 import ApprovalDots from "./ApprovalDots";
 import StatusBadge from "./StatusBadge";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Table,
   TableBody,
@@ -11,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table";
+} from "../../../../components/ui/table";
 import Pagination from "./Pagination";
 import { useState } from "react";
 import RequestDetailsModal from "./RequestDetailsModal";
@@ -88,7 +86,7 @@ const ClearanceTable = ({
                 <TableCell className="font-medium">{request.student.user.name}</TableCell>
                 <TableCell className="font-medium">{request.student_id}</TableCell>
                 <TableCell>{request.year}/{request.semester}</TableCell>
-                <TableCell>{request.department}</TableCell>
+                <TableCell>{request.department.department}</TableCell>
                 <TableCell>
                   <StatusBadge status={request.status} />
                 </TableCell>

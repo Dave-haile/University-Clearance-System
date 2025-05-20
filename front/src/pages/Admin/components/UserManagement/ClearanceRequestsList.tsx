@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Badge } from "../ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table";
+import { Badge } from "../../../../components/ui/badge";
 import { formatDate } from "../../utils/formatDate";
 import { ShieldCheck, ShieldX, Shield } from "lucide-react";
 import { ClearanceRequest } from "../../../../types/index";
@@ -24,6 +24,8 @@ const ClearanceRequestsList: React.FC<ClearanceRequestsListProps> = ({ clearance
   } catch (error) {
     console.error("Error parsing approvals:", error);
   }
+
+  console.log(clearanceRequest);
 
   // Helper function to render approval status icon
   const renderApprovalStatus = (status: boolean | null) => {
@@ -90,11 +92,11 @@ const ClearanceRequestsList: React.FC<ClearanceRequestsListProps> = ({ clearance
             <dl className="space-y-1">
               <div className="grid grid-cols-2">
                 <dt className="font-medium">Department:</dt>
-                <dd>{clearanceRequest.department}</dd>
+                <dd>{clearanceRequest.department.department}</dd>
               </div>
               <div className="grid grid-cols-2">
                 <dt className="font-medium">College:</dt>
-                <dd>{clearanceRequest.college}</dd>
+                <dd>{clearanceRequest.department.college}</dd>
               </div>
               <div className="grid grid-cols-2">
                 <dt className="font-medium">Current Step:</dt>

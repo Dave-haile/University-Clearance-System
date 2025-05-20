@@ -110,7 +110,6 @@ export interface Department {
     year: string;
     semester: string;
     section: string;
-    department: string;
     college: string;
     academic_year: string;
     last_day_class_attended: string;
@@ -126,6 +125,7 @@ export interface Department {
     archived: boolean;
     created_at: string;
     updated_at: string;
+    department: Department;
   }
   
   export interface Student {

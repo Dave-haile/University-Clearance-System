@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Select,
   SelectContent,
@@ -7,8 +7,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { Input } from "../ui/input";
+} from "../../../../components/ui/select";
+import { Input } from "../../../../components/ui/input";
 import { DepartmentFilter } from "../../../../types/department";
 
 interface DepartmentFiltersProps {

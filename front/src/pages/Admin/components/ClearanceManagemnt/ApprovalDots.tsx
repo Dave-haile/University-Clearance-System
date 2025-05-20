@@ -1,18 +1,8 @@
 // ApprovalDots.tsx
-import { Tooltip } from "../ui/tooltip";
-import { TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { ApprovalDotsProps, ApprovalsProps } from "@/types/clerance";
+import { Tooltip } from "../../../../components/ui/tooltip";
+import { TooltipContent, TooltipProvider, TooltipTrigger } from "../../../../components/ui/tooltip";
 
-interface ApprovalsProps {
-  department_head?: boolean | null;
-  library?: boolean | null;
-  cafeteria?: boolean | null;
-  proctor?: boolean | null;
-  registrar?: boolean | null;
-}
-
-interface ApprovalDotsProps {
-  approvals: ApprovalsProps | string | null; 
-}
 
 const ApprovalDots = ({ approvals }: ApprovalDotsProps) => {
   const parsedApprovals: ApprovalsProps = typeof approvals === 'string' 

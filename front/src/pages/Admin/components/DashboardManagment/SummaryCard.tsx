@@ -10,7 +10,7 @@ import {
   Clock,
   Ban,
 } from "lucide-react";
-import { GoogleLoader } from "../ui/GoogleLoder";
+import { GoogleLoader } from "../../../../components/ui/GoogleLoder";
 
 interface SummaryCardProps {
   title: string;

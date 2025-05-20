@@ -1,6 +1,6 @@
 
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Button } from "../../../../components/ui/button";
 import { 
   Select,
   SelectContent,
@@ -8,14 +8,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from "../ui/select";
+} from "../../../../components/ui/select";
+import { Department } from "@/types";
 
 interface FilterSectionProps {
   statusFilter: string;
   setStatusFilter: (status: string) => void;
   departmentFilter: string;
   setDepartmentFilter: (department: string) => void;
-  departments: string[];
+  departments: Department[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onClearFilters: () => void;
@@ -74,9 +75,9 @@ const FilterSection = ({
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all">All Departments</SelectItem>
-                {departments.map((department) => (
-                  <SelectItem key={department} value={department}>
-                    {department}
+                {departments.map((department,index) => (
+                  <SelectItem key={index} value={department.department}>
+                    {department.department}
                   </SelectItem>
                 ))}
               </SelectGroup>

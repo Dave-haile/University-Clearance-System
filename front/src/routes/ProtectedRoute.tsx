@@ -1,7 +1,7 @@
 // src/components/ProtectedRoute.tsx
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/authContext";
-import { GoogleLoader } from "../pages/Admin/components/ui/GoogleLoder";
+import { GoogleLoader } from "../components/ui/GoogleLoder";
 
 interface Props {
   allowedRoles: string[];

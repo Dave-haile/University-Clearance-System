@@ -3,7 +3,9 @@ import MainLayout from "../components/layout/MainLayout";
 import { PageHeader } from "../components/layout/PageHeader";
 import { useAuth } from "../../../context/authContext";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
+import axiosClient from "@/services/axiosBackend";
+import { showError } from "@/hooks/toast";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -13,9 +15,9 @@ const Settings = () => {
   });
 
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+    current_password: "",
+    new_password: "",
+    new_password_confirmation: "",
   });
 
   const [notificationSettings, setNotificationSettings] = useState({
@@ -26,39 +28,38 @@ const Settings = () => {
   });
   const [profileImage, setProfileImage] = useState(user?.profile_image || "");
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await axiosClient.put("/update-profile", profileForm);
+      console.log(response.data);
       toast.success("Profile updated successfully");
-    }, 500);
+    } catch (error) {
+      console.log(error);
+      showError('Error While Updating Profile')
+    }
   };
 
-  const handlePasswordUpdate = (e: React.FormEvent) => {
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simple validation
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+    if (passwordForm.new_password !== passwordForm.new_password_confirmation) {
       toast.error("New passwords don't match");
       return;
     }
-
-    // Simulate API call
-    setTimeout(() => {
+    console.log(passwordForm);
+    try {
+      const response = await axiosClient.post("/change-password", passwordForm);
+      console.log(response.data);
       toast.success("Password updated successfully");
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    }, 500);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // In a real app, you would upload the image to a server
-      // For now, we'll just create a local URL
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
     }
@@ -83,8 +84,6 @@ const Settings = () => {
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium mb-4">Profile Information</h2>
           <form onSubmit={handleProfileUpdate}>
-
-
             <div className="flex items-start gap-6 mb-6">
               <div className="flex-shrink-0">
                 <Avatar className="h-24 w-24">
@@ -174,11 +173,11 @@ const Settings = () => {
                 <input
                   id="current-password"
                   type="password"
-                  value={passwordForm.currentPassword}
+                  value={passwordForm.current_password}
                   onChange={(e) =>
                     setPasswordForm({
                       ...passwordForm,
-                      currentPassword: e.target.value,
+                      current_password: e.target.value,
                     })
                   }
                   className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
@@ -196,11 +195,11 @@ const Settings = () => {
                 <input
                   id="new-password"
                   type="password"
-                  value={passwordForm.newPassword}
+                  value={passwordForm.new_password}
                   onChange={(e) =>
                     setPasswordForm({
                       ...passwordForm,
-                      newPassword: e.target.value,
+                      new_password: e.target.value,
                     })
                   }
                   className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
@@ -218,11 +217,11 @@ const Settings = () => {
                 <input
                   id="confirm-password"
                   type="password"
-                  value={passwordForm.confirmPassword}
+                  value={passwordForm.new_password_confirmation}
                   onChange={(e) =>
                     setPasswordForm({
                       ...passwordForm,
-                      confirmPassword: e.target.value,
+                      new_password_confirmation: e.target.value,
                     })
                   }
                   className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"

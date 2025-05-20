@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useIsMobile } from "../../hooks/use-mobile";
 import {
@@ -21,7 +21,12 @@ interface SidebarLinkProps {
   collapsed: boolean;
 }
 
-const SidebarLink = ({ to, icon: Icon, label, collapsed }: SidebarLinkProps) => {
+const SidebarLink = ({
+  to,
+  icon: Icon,
+  label,
+  collapsed,
+}: SidebarLinkProps) => {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -46,10 +51,15 @@ const SidebarLink = ({ to, icon: Icon, label, collapsed }: SidebarLinkProps) => 
 
 interface SidebarProps {
   className?: string;
+  collapsed: boolean;
+  toggleCollapse: () => void;
 }
 
-export const Sidebar = ({ className}: SidebarProps) => {
-  const [collapsed, setCollapsed] = useState(false);
+export const Sidebar = ({
+  className,
+  collapsed,
+  toggleCollapse,
+}: SidebarProps) => {
   const isMobile = useIsMobile();
   const location = useLocation();
   const { logout } = useAuth();
@@ -57,22 +67,18 @@ export const Sidebar = ({ className}: SidebarProps) => {
   // Auto-collapse on mobile
   useEffect(() => {
     if (isMobile) {
-      setCollapsed(true);
-    } else {
-      setCollapsed(false);
+      toggleCollapse();
     }
-  }, [isMobile]);
+  }, [isMobile, toggleCollapse]);
 
   // Close sidebar when route changes on mobile
-  useEffect(() => {
+   useEffect(() => {
     if (isMobile) {
-      setCollapsed(true);
+      toggleCollapse();
     }
-  }, [location.pathname, isMobile]);
+  }, [location.pathname, isMobile, toggleCollapse]);
 
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
+
 
   return (
     <div
@@ -92,7 +98,7 @@ export const Sidebar = ({ className}: SidebarProps) => {
             "rounded-md p-1.5 text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
             collapsed && "mx-auto"
           )}
-          onClick={toggleSidebar}
+          onClick={toggleCollapse}
         >
           {collapsed ? (
             <ChevronRight className="h-5 w-5" />

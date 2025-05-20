@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+} from "../../../../components/ui/dialog";
+import { Button } from "../../../../components/ui/button";
 import StatusBadge from "./StatusBadge";
 import { ClearanceRequests } from "../../../../types/clerance";
 
@@ -23,6 +23,7 @@ const RequestDetailsModal = ({
   isOpen,
   onClose,
 }: RequestDetailsModalProps) => {
+  console.log(request);
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "MMMM dd, yyyy");
@@ -32,12 +33,23 @@ const RequestDetailsModal = ({
     }
   };
 
+  console.log(request);
+
   const formatApprovalStatus = (status: boolean | null) => {
-    return status ? (
-      <span className="text-green-500 font-medium">Approved</span>
-    ) : (
-      <span className="text-orange-400 font-medium">Pending</span>
-    );
+    // return status ? (
+    //   <span className="text-green-500 font-medium">Approved</span>
+    // ) : (
+    //   <span className="text-orange-400 font-medium">Pending</span>
+    // );
+    if(status){
+      return  <span className="text-green-500 font-medium">Approved</span>
+    }
+    else if(status === false){
+      return  <span className="text-red-500 font-medium">Rejected</span>
+    }
+    else if(status === null){
+      return  <span className="text-orange-400 font-medium">Pending</span>
+    }
   };
 
   return (
@@ -86,10 +98,10 @@ const RequestDetailsModal = ({
               <h3 className="text-sm font-medium text-gray-500">Academic Details</h3>
               <div className="mt-1">
                 <p>
-                  <span className="font-medium">Department:</span> {request.department}
+                  <span className="font-medium">Department:</span> {request.department.department}
                 </p>
                 <p>
-                  <span className="font-medium">College:</span> {request.college}
+                  <span className="font-medium">College:</span> {request.department.college}
                 </p>
                 <p>
                   <span className="font-medium">Academic Year:</span> {request.academic_year}

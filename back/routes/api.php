@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClearanceApprovalController;
 use App\Http\Controllers\ClearanceRequestController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use App\Models\ClearanceRequest;
 use App\Models\Student;
@@ -28,6 +29,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/departmentDisplay', [StaffController::class, 'show']);
     Route::post('/staffAccountCreation', [StaffController::class, 'store']);
     Route::post('profile-image', [UserController::class, 'updateProfilePicture']);
+    Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::put('/update-profile', [UserController::class, 'updateProfile']);
 });
 // Admin routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -42,6 +45,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/users/{id}/update', [AdminController::class, 'update']);
     Route::delete('/admin/users/{id}/delete', [AdminController::class, 'destroy']);
     Route::put('/admin/users/{id}/reset-password', [AdminController::class, 'resetPassword']);
+});
+// Student routes
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/student/clearance-requests', [StudentController::class, 'show']);
+    Route::get('/student/data', [StudentController::class, 'index']);
 });
 
 Route::get('/Allclearance-requsets', [ClearanceRequestController::class, 'display']);

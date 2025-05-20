@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from "react";
 import { format, parseISO } from "date-fns";
 import RoleFilter from "./RoleFilter";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "../ui/dialog";
+} from "../../../../components/ui/dialog";
 import { Edit, Trash2, Key, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { FilterOption, User } from "../../../../types/user";

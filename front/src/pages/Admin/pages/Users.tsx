@@ -14,7 +14,7 @@ import { UserPlus } from "lucide-react";
 import CreateUserDialog from "../components/UserManagement/CreateUserDialog";
 import EditUserDialog from "../components/UserManagement/EditUserDialog";
 import DeleteUserDialog from "../components/UserManagement/DeleteUserDialog";
-import { notifySuccess, showError } from "../../../hooks/toast";
+import { showError } from "@/hooks/toast";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -59,7 +59,6 @@ const User: React.FC = () => {
       const data = await axiosClient.get("/admin/users");
       setUsers(data.data);
       setError(null);
-      notifySuccess("User's are Fetched Successfully");
     } catch (err) {
       setError("Failed to load users. Please try again later.");
       console.log("Error fetching users:", err);
@@ -138,7 +137,7 @@ const User: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-1 py-2">
+      <div className="mx-auto px-1 py-2">
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div className="mb-4 md:mb-0">
             <h1 className="text-3xl font-bold text-gray-800">

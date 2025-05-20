@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "../../../../components/ui/alert-dialog";
 // import { Button } from "../ui/button";
 
 interface DeleteConfirmationDialogProps {

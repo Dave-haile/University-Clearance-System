@@ -2,11 +2,10 @@ import { GraduationCap, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/authContext";
 import DarkMode from "./DarkMode";
-import { useState } from "react";
 
 export default function Header() {
   const { token,user } = useAuth();
-  const [message, setMessage] = useState();
+  // const [message, setMessage] = useState();
   const text = user?.name;
   const username = text?.split(" ")[0];
   const {logout} = useAuth();

@@ -3,15 +3,16 @@ import useFetchClearanceRequests from "../components/ApproveClearance";
 import axiosClient from "../../../services/axiosBackend";
 
 const LibraryApproval = () => {
-    const { requests, loading, error, fetchClearanceRequests } = useFetchClearanceRequests("department_head");
+    const { requests, loading, error, fetchClearanceRequests } = useFetchClearanceRequests("registrar");
     const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
     const [status, setStatus] = useState("approved");
     const [remarks, setRemarks] = useState("");
 
+    
     const handleApproval = async (id: number) => {
         try {
             await axiosClient.post(`/approve-clearance/${id}`, {
-                staff_role: "department_head",
+                staff_role: "registrar",
                 status,
                 remarks,
             });

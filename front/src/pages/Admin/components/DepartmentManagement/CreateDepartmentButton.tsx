@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../../../../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,16 +7,16 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "../ui/dialog";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+} from "../../../../components/ui/dialog";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../../../../components/ui/select";
 import { PlusIcon, UserRoundIcon } from "lucide-react";
 import { toast } from "sonner";
 

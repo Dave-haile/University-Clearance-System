@@ -5,7 +5,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { ClearanceDisplay } from '../../../../types/clerance';
-import { Button } from '../ui/button';
+import { Button } from '../../../../components/ui/button';
 
 
 interface DataGridProps {
@@ -226,7 +226,7 @@ const ClearanceDataGrid: React.FC<DataGridProps> = ({ data }) => {
                 <tr key={row.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.username}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.department}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.department.department}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.sex}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.academicYear}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{row.year}</td>

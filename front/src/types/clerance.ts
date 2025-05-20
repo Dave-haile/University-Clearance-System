@@ -1,3 +1,5 @@
+import { Department } from ".";
+
 export interface User {
   id: number;
   name: string;
@@ -23,7 +25,7 @@ export interface ClearanceRequest {
   year: string;
   semester: string;
   section: string;
-  department: string;
+  department: Department;
   college: string;
   academic_year: string;
   last_day_class_attended: string;
@@ -35,7 +37,7 @@ export interface ClearanceRequest {
 export interface ClearanceRequests {
   id: number;
   student_id: string;
-  status: string;
+  status: "approved" | "pending" | "rejected";
   approvals: {
     department_head: boolean | null;
     library: boolean | null;
@@ -46,7 +48,7 @@ export interface ClearanceRequests {
   year: string;
   semester: string;
   section: string;
-  department: string;
+  department: Department;
   college: string;
   academic_year: string;
   last_day_class_attended: string;
@@ -61,8 +63,6 @@ export interface ClearanceRequests {
   library_approved: boolean | null;
   proctor_approved: boolean | null;
   registrar_approved: boolean | null;
-
-
 }
 
 export interface ClearanceDisplay {
@@ -70,7 +70,7 @@ export interface ClearanceDisplay {
   student_id: string;
   username: string;
   college: string;
-  department: string;
+  department: Department;
   sex: string;
   academicYear: string;
   year: string;
@@ -82,3 +82,25 @@ export interface ClearanceDisplay {
   lastDay: string;
   createdAt: string;
 }
+export interface ApprovalsProps {
+  department_head?: boolean | null;
+  library?: boolean | null;
+  cafeteria?: boolean | null;
+  proctor?: boolean | null;
+  registrar?: boolean | null;
+}
+
+export interface ApprovalDotsProps {
+  approvals: ApprovalsProps | string | null; 
+}
+
+export type ApprovalStatus = boolean | null;
+export interface ApprovalClearanceStatusCard {
+  department_head: ApprovalStatus;
+  library: ApprovalStatus;
+  cafeteria: ApprovalStatus;
+  proctor: ApprovalStatus;
+  registrar: ApprovalStatus;
+  [key: string]: ApprovalStatus; // Index signature for additional properties
+}
+export type ClearanceStatus = "approved" | "pending" | "rejected";

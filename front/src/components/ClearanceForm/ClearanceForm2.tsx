@@ -18,6 +18,7 @@ import { TextArea } from "./ui/TextArea";
 import axiosClient from "../../services/axiosBackend";
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
+import { MainLayout } from "@/pages/Student/components/layout/MainLayout";
 
 function ClearanceForm2() {
   const {
@@ -41,8 +42,15 @@ function ClearanceForm2() {
 
   const onSubmit = async (formData: ClearanceFormData) => {
     console.log(formData);
+    const transformData = { ...formData };
+    delete transformData.department;
+    delete transformData.college;
+    console.log(transformData);
     try {
-      const response = await axiosClient.post("/clearance-request", formData);
+      const response = await axiosClient.post(
+        "/clearance-request",
+        transformData
+      );
       setMessage(response.data.message);
       console.log(response);
       console.log(response.data);
@@ -61,185 +69,187 @@ function ClearanceForm2() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-6"
-    >
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          University Clearance Form
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Please fill out all required fields marked with an asterisk (*)
-        </p>
-      </div>
+    <MainLayout>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-6"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">
+            University Clearance Form
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Please fill out all required fields marked with an asterisk (*)
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input
-          label="Full Name"
-          required
-          {...register("first_name")}
-          error={errors.first_name?.message}
-          disabled={true}
-          value={user?.name}
-        />
-
-        <Select
-          label="Sex"
-          required
-          options={[
-            { value: "Male", label: "Male" },
-            { value: "Female", label: "Female" },
-          ]}
-          {...register("sex")}
-          error={errors.sex?.message}
-        />
-
-        <Input
-          label="ID Number"
-          required
-          {...register("id_number")}
-          error={errors.id_number?.message}
-          value={user?.student?.student_id}
-        />
-
-        <Select
-          label="College"
-          required
-          options={colleges.map((college) => ({
-            value: college.name,
-            label: college.name,
-          }))}
-          {...register("college")}
-          error={errors.college?.message}
-          onChange={(e) => {
-            setValue("college", e.target.value);
-            setValue("department", "");
-          }}
-        />
-
-        <Select
-          label="Department"
-          required
-          options={departments.map((dept) => ({
-            value: dept,
-            label: dept,
-          }))}
-          {...register("department")}
-          error={errors.department?.message}
-          disabled={!selectedCollege}
-        />
-
-        <Input
-          label="Last Day Attended"
-          type="date"
-          required
-          {...register("last_day_class_attended")}
-          error={errors.last_day_class_attended?.message}
-        />
-
-        <Input
-          label="Academic Year"
-          required
-          placeholder="e.g., 2023/2024"
-          {...register("academic_year")}
-          error={errors.academic_year?.message}
-          value={date - 8}
-        />
-
-        <div className="grid grid-cols-2 gap-4 md:col-span-2">
-          <Select
-            label="Year of Study"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="Full Name"
             required
-            options={yearOptions}
-            {...register("year")}
-            error={errors.year?.message}
+            {...register("first_name")}
+            error={errors.first_name?.message}
+            disabled={true}
+            value={user?.name}
           />
 
           <Select
-            label="Semester"
+            label="Sex"
             required
-            options={semesterOptions}
-            {...register("semester")}
-            error={errors.semester?.message}
+            options={[
+              { value: "Male", label: "Male" },
+              { value: "Female", label: "Female" },
+            ]}
+            {...register("sex")}
+            error={errors.sex?.message}
           />
 
           <Input
-            label="Section"
+            label="ID Number"
             required
-            {...register("section")}
-            error={errors.section?.message}
+            {...register("id_number")}
+            error={errors.id_number?.message}
+            value={user?.student?.student_id}
           />
-        </div>
 
-        <div className="md:col-span-2">
-          <RadioGroup
-            label="Reason for Clearing"
-            name="reason_for_clearance"
-            options={clearingReasons}
-            value={selectedReason}
-            onChange={(e) => setValue("reason_for_clearance", e.target.value)}
-            error={errors.reason_for_clearance?.message}
+          <Select
+            label="College"
+            required
+            options={colleges.map((college) => ({
+              value: college.name,
+              label: college.name,
+            }))}
+            {...register("college")}
+            error={errors.college?.message}
+            onChange={(e) => {
+              setValue("college", e.target.value);
+              setValue("department", "");
+            }}
           />
-        </div>
 
-        {selectedReason === "other" && (
-          <div className="md:col-span-2">
-            <TextArea
-              label="Please specify other reason"
+          <Select
+            label="Department"
+            required
+            options={departments.map((dept) => ({
+              value: dept,
+              label: dept,
+            }))}
+            {...register("department")}
+            error={errors.department?.message}
+            disabled={!selectedCollege}
+          />
+
+          <Input
+            label="Last Day Attended"
+            type="date"
+            required
+            {...register("last_day_class_attended")}
+            error={errors.last_day_class_attended?.message}
+          />
+
+          <Input
+            label="Academic Year"
+            required
+            placeholder="e.g., 2023/2024"
+            {...register("academic_year")}
+            error={errors.academic_year?.message}
+            value={date - 8}
+          />
+
+          <div className="grid grid-cols-2 gap-4 md:col-span-2">
+            <Select
+              label="Year of Study"
               required
-              rows={3}
-              {...register("other_reason")}
-              error={errors.other_reason?.message}
+              options={yearOptions}
+              {...register("year")}
+              error={errors.year?.message}
+            />
+
+            <Select
+              label="Semester"
+              required
+              options={semesterOptions}
+              {...register("semester")}
+              error={errors.semester?.message}
+            />
+
+            <Input
+              label="Section"
+              required
+              {...register("section")}
+              error={errors.section?.message}
             />
           </div>
-        )}
-      </div>
-      <div className="grid grid-cols-2 gap-4 md:col-span-2">
-        <Select
-          label="Cafe Status"
-          options={cafeStatus}
-          {...register("cafe_status")}
-          error={errors.cafe_status?.message}
-        />
-        <Select
-          label="Dorm Status"
-          options={dormStatus}
-          {...register("dorm_status")}
-          error={errors.dorm_status?.message}
-        />
-      </div>
-      {message && (
-        <div className="p-4 bg-green-50 text-green-700 rounded-md">
-          {message}
-        </div>
-      )}
 
-      {errors.root && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-md flex items-start gap-2">
-          <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-medium">Error submitting form</p>
-            <p className="mt-1 text-sm">{errors.root?.message}</p>
+          <div className="md:col-span-2">
+            <RadioGroup
+              label="Reason for Clearing"
+              name="reason_for_clearance"
+              options={clearingReasons}
+              value={selectedReason}
+              onChange={(e) => setValue("reason_for_clearance", e.target.value)}
+              error={errors.reason_for_clearance?.message}
+            />
           </div>
-        </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
-            Submitting...
-          </>
-        ) : (
-          "Submit Clearance Form"
+          {selectedReason === "other" && (
+            <div className="md:col-span-2">
+              <TextArea
+                label="Please specify other reason"
+                required
+                rows={3}
+                {...register("other_reason")}
+                error={errors.other_reason?.message}
+              />
+            </div>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:col-span-2">
+          <Select
+            label="Cafe Status"
+            options={cafeStatus}
+            {...register("cafe_status")}
+            error={errors.cafe_status?.message}
+          />
+          <Select
+            label="Dorm Status"
+            options={dormStatus}
+            {...register("dorm_status")}
+            error={errors.dorm_status?.message}
+          />
+        </div>
+        {message && (
+          <div className="p-4 bg-green-50 text-green-700 rounded-md">
+            {message}
+          </div>
         )}
-      </button>
-    </form>
+
+        {errors.root && (
+          <div className="p-4 bg-red-50 text-red-700 rounded-md flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium">Error submitting form</p>
+              <p className="mt-1 text-sm">{errors.root?.message}</p>
+            </div>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
+              Submitting...
+            </>
+          ) : (
+            "Submit Clearance Form"
+          )}
+        </button>
+      </form>
+    </MainLayout>
   );
 }
 export default ClearanceForm2;

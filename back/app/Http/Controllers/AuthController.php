@@ -29,7 +29,7 @@ class AuthController extends Controller
         $department = Department::where('department', $validated['department'])->first();
         logger($department->department);
         logger($department->college);
-        logger($department->id);    
+        logger($department->id);
 
         if (!$department) {
             return response()->json([
@@ -58,6 +58,24 @@ class AuthController extends Controller
             'password' => $password
         ]);
     }
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed'
+        ]);
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 422);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password changed successfully']);
+    }
+
     public function login(LoginRequest $request)
     {
         $request->validated();

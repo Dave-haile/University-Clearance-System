@@ -10,7 +10,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'position', 'department', 'role', 'department_id'];
+    protected $fillable = ['user_id', 'position', 'department', 'role', 'department_id','phone_number'];
 
     public function user()
     {

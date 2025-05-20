@@ -20,8 +20,8 @@ import LibraryApproval from "../components/Staff/Page/Library";
 import ClearanceRequestsTable from "../components/Staff/components/ClearanceRequestsTable";
 import AdminDashboard from "../pages/Admin/adminDashboard";
 import DisplayAllClearance from "../components/Staff/components/DisplayAllClearance";
-import CreateStaff from "../pages/Admin/CreateAccount";
-import CreateNewCollegeDepartment from "../pages/Admin/CreatNewCollegeDepartment";
+import CreateStaff from "../pages/Admin/components/UserManagement/CreateAccount";
+import CreateNewCollegeDepartment from "../pages/Admin/components/DepartmentManagement/CreatNewCollegeDepartment";
 import AdminDash from "../pages/Admin/AdminDash";
 
 const route = createBrowserRouter([
