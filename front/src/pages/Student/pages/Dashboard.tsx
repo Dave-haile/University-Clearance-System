@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import WelcomeCard from "../components/DashboardboardManagment/WelcomeCard";
 import ClearanceStatusCard from "../components/DashboardboardManagment/ClearanceStatusCard";
 import ProgressTracker from "../components/DashboardboardManagment/ProgressTracker";
-import RecentMessages from "../components/DashboardboardManagment/RecentMessages";
 import QuickActions from "../components/DashboardboardManagment/QuickActions";
 import { MainLayout } from "../components/layout/MainLayout";
 import axiosClient from "@/services/axiosBackend";
-// import { Button } from "@mui/material";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User } from "@/types/student";
 import { toast } from "sonner";
@@ -22,11 +20,11 @@ import {
 import { Button } from "@/components/ui/button";
 
 const Dashboard: React.FC = () => {
-  const [data, setData] = useState<User[]>([]);
+  const [data, setData] = useState<User | null>(null);
   const [loading, setloading] = useState(false);
 
   const getData = async () => {
-    setloading(true)
+    setloading(true);
     try {
       const response = await axiosClient.get("/student/data");
       setData(response.data);
@@ -46,8 +44,8 @@ const Dashboard: React.FC = () => {
         console.log(error.response.data.message || "Error fetching data");
         toast.error("Error fetching data");
       } else {
-        console.log("Error fetching data");
-        toast("Error fetching data");
+        console.log(error);
+        toast.error("Error fetching data");
       }
     } finally {
       setloading(false);
@@ -57,6 +55,8 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  // console.log(data?.student.clearance_requests[1]);
 
   if (loading) {
     return (
@@ -85,31 +85,35 @@ const Dashboard: React.FC = () => {
   return (
     <MainLayout>
       <div className="flex justify-end">
-        <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700" onClick={getData}>
+        <Button
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 mb-2"
+          onClick={getData}
+        >
           <RefreshCcw className="h-4 w-4" /> Refresh
         </Button>
       </div>
       <div className="space-y-6">
-        {data.length > 0 && (
+        {data && (
           <>
             <WelcomeCard student={data} />
 
-            {data[0].student.clearance_requests !== null ? (
+            {data.student.clearance_requests !== null &&
+            data.student.clearance_requests?.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-1">
                   <ClearanceStatusCard
                     approvals={
-                      data[0].student.clearance_requests?.approvals || {}
+                      data?.student.clearance_requests[0]?.approvals || {}
                     }
                     status={
-                      data[0].student.clearance_requests?.status || "pending"
+                      data?.student.clearance_requests[0]?.status || "pending"
                     }
                   />
                 </div>
                 <div className="lg:col-span-2">
                   <ProgressTracker
                     approvals={
-                      data[0].student.clearance_requests?.approvals || {}
+                      data?.student.clearance_requests[0]?.approvals || {}
                     }
                     status={"approved"}
                   />
@@ -147,10 +151,9 @@ const Dashboard: React.FC = () => {
           </>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <RecentMessages />
-          <QuickActions />
-        </div>
+        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full"> */}
+        <QuickActions />
+        {/* </div> */}
       </div>
     </MainLayout>
   );

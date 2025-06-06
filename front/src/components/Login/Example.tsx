@@ -24,7 +24,16 @@ const Login: React.FC = () => {
     if (token) {
       if (user?.role === "admin") navigator("/admin");
       else if (user?.role === "student") navigator("/student");
-      else navigator("/staff");
+      else if (
+        [
+          "department_head",
+          "library",
+          "cafeteria",
+          "registrar",
+          "proctor",
+        ].includes(user?.role ?? "")
+      )
+        navigator(`/staff/${user?.role}`);
     }
   }, [token, navigator, user]);
 
@@ -52,7 +61,7 @@ const Login: React.FC = () => {
           "proctor",
         ].includes(user?.role ?? "")
       ) {
-        navigator("/staff", {
+        navigator(`/staff/${user?.role}`, {
           state: { message: `Welcome back, member!` },
         });
       }

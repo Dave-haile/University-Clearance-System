@@ -16,7 +16,7 @@ import Login from "../components/Login/Login";
 // import ResetPasswordFlow from "../Page/Parent";
 import LoginExample from "../components/Login/Example";
 import StudentUpload from "../components/Staff/components/csvUplaod";
-import LibraryApproval from "../components/Staff/Page/Library";
+import LibraryApproval from "../pages/Staff/Page/Library";
 import ClearanceRequestsTable from "../components/Staff/components/ClearanceRequestsTable";
 import AdminDashboard from "../pages/Admin/adminDashboard";
 import DisplayAllClearance from "../components/Staff/components/DisplayAllClearance";

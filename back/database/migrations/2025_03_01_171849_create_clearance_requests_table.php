@@ -16,7 +16,7 @@ return new class extends Migration
             $table->json('approvals')->nullable();
             $table->string('year');
             $table->string('semester');
-            $table->string('section');
+            $table->string('section')->nullable();
             $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->string('academic_year');
             $table->date('last_day_class_attended');

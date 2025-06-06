@@ -22,13 +22,14 @@ interface ClearanceTableProps {
   setCurrentPage: (page: number) => void;
 }
 
-const ClearanceTable = ({ 
-  clearanceRequests, 
-  currentPage, 
-  totalPages, 
-  setCurrentPage 
+const ClearanceTable = ({
+  clearanceRequests,
+  currentPage,
+  totalPages,
+  setCurrentPage,
 }: ClearanceTableProps) => {
-  const [selectedRequest, setSelectedRequest] = useState<ClearanceRequests | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<ClearanceRequests | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleViewDetails = (request: ClearanceRequests) => {
@@ -58,7 +59,7 @@ const ClearanceTable = ({
   };
 
   const formatCurrentStep = (step: string) => {
-    return step.charAt(0).toUpperCase() + step.slice(1).replace('_', ' ');
+    return step.charAt(0).toUpperCase() + step.slice(1).replace("_", " ");
   };
 
   return (
@@ -81,20 +82,30 @@ const ClearanceTable = ({
           </TableHeader>
           <TableBody>
             {clearanceRequests.map((request) => (
-              <TableRow onClick={() => handleViewDetails(request)} className="hover:cursor-pointer" key={request.id}>
-                <TableCell className="font-medium text-center">{request.id}</TableCell>
-                <TableCell className="font-medium">{request.student.user.name}</TableCell>
-                <TableCell className="font-medium">{request.student_id}</TableCell>
-                <TableCell>{request.year}/{request.semester}</TableCell>
+              <TableRow
+                onClick={() => handleViewDetails(request)}
+                className="hover:cursor-pointer"
+                key={request.id}
+              >
+                <TableCell className="font-medium text-center">
+                  {request.id}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {request.student.user.name}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {request.student_id}
+                </TableCell>
+                <TableCell>
+                  {request.year}/{request.semester}
+                </TableCell>
                 <TableCell>{request.department.department}</TableCell>
                 <TableCell>
                   <StatusBadge status={request.status} />
                 </TableCell>
+                <TableCell>{formatCurrentStep(request.current_step)}</TableCell>
                 <TableCell>
-                  {formatCurrentStep(request.current_step)}
-                </TableCell>
-                <TableCell>
-                <ApprovalDots approvals={request.approvals} />
+                  <ApprovalDots approvals={request.approvals} />
                 </TableCell>
                 <TableCell>{formatDate(request.created_at)}</TableCell>
                 <TableCell className="text-right">

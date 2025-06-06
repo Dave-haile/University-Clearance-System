@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardContent,
   CardFooter,
-} from "../components/ui/Card";
-import Button from "../components/ui/Button";
+} from "../ui/Card";
+import Button from "../ui/Button";
 import { Loader2 } from "lucide-react";
-import { MainLayout } from "../components/layout/MainLayout";
+import { MainLayout } from "../layout/MainLayout";
 
 // Mock user data - Replace with actual API call
 const mockUser = {

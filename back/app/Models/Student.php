@@ -16,7 +16,7 @@ class Student extends Model
         return $this->belongsTo(User::class);
     }
     public function clearance_requests(){
-        return $this->hasone(ClearanceRequest::class,'student_id','student_id');
+        return $this->hasMany(ClearanceRequest::class,'student_id','student_id');
     }
     public function department()
     {

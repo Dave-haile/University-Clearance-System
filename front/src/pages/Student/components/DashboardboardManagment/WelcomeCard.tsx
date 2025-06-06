@@ -4,7 +4,7 @@ import { Card, CardContent } from "../ui/Card";
 import { User } from "@/types/student";
 
 interface WelcomeCardProps {
-  student: User[] | undefined;
+  student: User | null | undefined;
 }
 
 const WelcomeCard: React.FC<WelcomeCardProps> = ({ student }) => {
@@ -18,12 +18,11 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ student }) => {
   const formattedDate = today.toLocaleDateString("en-US", options);
   return (
     <Card className="bg-gradient-to-r from-blue-800 to-blue-900 text-white">
-      {student?.map((stud) => (
-        <CardContent key={stud?.id} className="py-6">
+        <CardContent key={student?.id} className="py-6">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-bold">
-                Welcome back, {stud?.name.split(" ")[0]}!
+                Welcome back, {student?.name.split(" ")[0]}!
               </h1>
               <p className="mt-2 text-blue-100">
                 Track and manage your university clearance process from one
@@ -40,16 +39,16 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ student }) => {
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <p className="text-blue-100 text-sm">Department</p>
               <p className="font-medium mt-1">
-                {stud?.student?.department?.department}
+                {student?.student?.department?.department}
               </p>
             </div>
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <p className="text-blue-100 text-sm">Student ID</p>
-              <p className="font-medium mt-1">{stud?.student?.student_id}</p>
+              <p className="font-medium mt-1">{student?.student?.student_id}</p>
             </div>
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <p className="text-blue-100 text-sm">Academic Level</p>
-              <p className="font-medium mt-1">{stud?.student?.year}</p>
+              <p className="font-medium mt-1">{student?.student?.year}</p>
             </div>
             <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
               <p className="text-blue-100 text-sm">Status</p>
@@ -57,7 +56,6 @@ const WelcomeCard: React.FC<WelcomeCardProps> = ({ student }) => {
             </div>
           </div>
         </CardContent>
-      ))}
     </Card>
   );
 };

@@ -67,15 +67,12 @@ class ClearanceRequestController extends Controller
         $user = Auth::user();
         $student = Student::where('user_id', $user->id)->first();
 
-        Log::info('hello after before all');
         if (!$student) {
-            return response()->json(['message'=> 'student not found']);
+            return response()->json(['message' => 'student not found']);
         }
-        Log::info('hello before department');
         if (!$student->department_id) {
             return response()->json(['message' => 'Student department not found'], 400);
         }
-        Log::info('hello after department');
 
         $student_id = $student->student_id;
 
@@ -101,8 +98,6 @@ class ClearanceRequestController extends Controller
             'proctor' => null,
             'registrar' => null,
         ];
-        Log::info($student->department_id);
-
         $clearanceRequest = ClearanceRequest::create([
             'student_id' => $student_id,
             'sex' => $validatedData['sex'],
@@ -143,7 +138,7 @@ class ClearanceRequestController extends Controller
 
         $clearanceRequests = ClearanceRequest::where("current_step", $roleToStep[$staffRole])
             ->where("status", "!=", "rejected") // Exclude rejected requests
-            ->with(['student', 'student.user']) // Load student and user details
+            ->with(['student', 'student.user','department']) // Load student and user details
             ->orderBy('created_at', 'desc')
             ->get();
 

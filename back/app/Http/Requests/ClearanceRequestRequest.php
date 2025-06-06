@@ -24,7 +24,7 @@ class ClearanceRequestRequest extends FormRequest
         return [
             'year' => 'required|string',
             'semester' => 'required|string',
-            'section' => 'required|string',
+            'section' => 'nullable|string',
             'academic_year' => 'required|string',
             'last_day_class_attended' => 'required|date',
             'reason_for_clearance' => 'required|string',

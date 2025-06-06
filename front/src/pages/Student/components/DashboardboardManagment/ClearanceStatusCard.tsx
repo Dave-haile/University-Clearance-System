@@ -1,20 +1,17 @@
-import { ApprovalClearanceStatusCard, ClearanceStatus } from "@/types/clerance";
+import { ApprovalClearanceStatusCard2, ClearanceStatus } from "@/types/clerance";
 import { Card, CardHeader, CardContent } from "../ui/Card";
 import StatusIndicator from "../ui/StatusIndicator";
 
 export interface ClearanceStatusCardProps {
-  approvals: Partial<ApprovalClearanceStatusCard>;
+  approvals: Partial<ApprovalClearanceStatusCard2>;
   status: ClearanceStatus;
 }
-
 
 const ClearanceStatusCard = ({
   approvals,
   status,
 }: ClearanceStatusCardProps) => {
-  
-  const parsedApprovals =
-    typeof approvals === "string" ? JSON.parse(approvals) : approvals || {};
+  const parsedApprovals = typeof approvals === "string" ? JSON.parse(approvals) : approvals || {};
 
   const approvalSteps = [
     {
@@ -44,10 +41,29 @@ const ClearanceStatusCard = ({
     },
   ];
 
+
+
+  const rejectedApproval = approvalSteps.find(
+    (step) => step.status?.status === "rejected"
+  );
+  
+  // if (rejectedApproval) {
+  //   const rejectedDepartmentInfo: ApprovalsForReject = {
+  //     remarks: rejectedApproval.status.remarks,
+  //     timeStamp: rejectedApproval.status.timestamp,
+  //     approved_by: rejectedApproval.status.approved_by,
+  //     status: rejectedApproval.status.status,
+  //   };
+  //   // Now you can use rejectedDepartmentInfo as needed
+  // } else {
+  //   console.log("No rejections found");
+  // }
+
   const statusMessages = {
     approved: "You have been successfully cleared. Congratulations!",
-    pending: "Your clearance is in progress. Please complete all required steps.",
-    rejected: "Your clearance has been rejected in at least one department. Please resolve the issues.",
+    pending:
+      "Your clearance is in progress. Please complete all required steps.",
+    rejected: <>Your clearance has been rejected in {rejectedApproval?.name} because of <span className="font-bold text-red-500">{rejectedApproval?.status.remarks}</span> </>,
   };
 
   return (
@@ -112,11 +128,15 @@ const ClearanceStatusCard = ({
             {approvalSteps.map((step) => (
               <div key={step.id} className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">{step.name}</span>
-                <StatusIndicator 
+                <StatusIndicator
                   // status={step.status === true ? 'approved' : step.status === false ? 'rejected' : 'pending'}
-                  status={step?.status?.status === undefined ? 'pending' : step?.status?.status} 
-                  size="sm" 
-                  showText 
+                  status={
+                    step?.status?.status === undefined
+                      ? "pending"
+                      : step?.status?.status
+                  }
+                  size="sm"
+                  showText
                 />
               </div>
             ))}

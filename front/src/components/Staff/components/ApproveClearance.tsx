@@ -196,10 +196,6 @@ const useFetchClearanceRequests = (staffRole: string) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchClearanceRequests();
-  }, []);
-
   const fetchClearanceRequests = async () => {
     setLoading(true);
     try {
@@ -220,7 +216,9 @@ const useFetchClearanceRequests = (staffRole: string) => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    fetchClearanceRequests();
+  }, []);
   return { requests, loading, error, fetchClearanceRequests };
 };
 

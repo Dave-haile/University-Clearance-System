@@ -132,6 +132,8 @@ export function ClearanceRequestForm({
             error.response?.data?.message ||
               "Failed to submit clearance request. Please try again."
           );
+        } else {
+          toast.error("Failed to submit clearance request. Please try again.");
         }
       } else {
         console.log(error);
@@ -161,7 +163,7 @@ export function ClearanceRequestForm({
                 id="student_id"
                 value={studentData?.student?.student_id || "N/A"}
                 disabled
-                className="bg-background/50"
+                className="bg-background/50 disabled:cursor-default"
               />
             </div>
             <div>
@@ -170,7 +172,7 @@ export function ClearanceRequestForm({
                 id="full_name"
                 value={studentData?.name || "N/A"}
                 disabled
-                className="bg-background/50"
+                className="bg-background/50 disabled:cursor-default"
               />
             </div>
             <div>
@@ -179,7 +181,7 @@ export function ClearanceRequestForm({
                 id="department"
                 value={studentData?.student?.department?.department || "N/A"}
                 disabled
-                className="bg-background/50"
+                className="bg-background/50 disabled:cursor-default"
               />
             </div>
             <div>
@@ -188,7 +190,7 @@ export function ClearanceRequestForm({
                 id="college"
                 value={studentData?.student?.department?.college || "N/A"}
                 disabled
-                className="bg-background/50"
+                className="bg-background/50 disabled:cursor-default"
               />
             </div>
           </div>
@@ -241,8 +243,8 @@ export function ClearanceRequestForm({
                           <SelectValue placeholder="Select Semester" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="1">1st Semester</SelectItem>
-                          <SelectItem value="2">2nd Semester</SelectItem>
+                          <SelectItem value="First">1st Semester</SelectItem>
+                          <SelectItem value="Second">2nd Semester</SelectItem>
                         </SelectContent>
                       </Select>
                     </FormControl>

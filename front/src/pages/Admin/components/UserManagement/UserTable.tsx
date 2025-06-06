@@ -4,7 +4,7 @@ import { SortDirection, SortField, User } from "../../../../types/user";
 // import { toast as toaster } from "sonner";
 // import { Edit, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "@/context/authContext";
 
 interface UserTableProps {
   users: User[];
@@ -32,8 +32,15 @@ const UserTable: React.FC<UserTableProps> = ({
   //   setIsDeleteDialogOpen(false);
   //   setSelectedUserId(null);
   // };
+  const { user } = useAuth();
   const handleRowClick = (userId: string) => {
-    navigate(`/admin/users/${userId}`);
+    if (user?.role === "admin") {
+      navigate(`/admin/users/${userId}`);
+      return;
+    } else if (user?.role === "department_head") {
+      navigate(`/department-head/student/${userId}`);
+      return;
+    }
   };
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
@@ -107,8 +114,10 @@ const UserTable: React.FC<UserTableProps> = ({
         <tbody>
           {users.map((user) => (
             <tr
-            onClick={() => handleRowClick(user.id.toString())}
-            key={user.id} className="border-b hover:bg-gray-50 hover:cursor-pointer">
+              onClick={() => handleRowClick(user.id.toString())}
+              key={user.id}
+              className="border-b hover:bg-gray-50 hover:cursor-pointer"
+            >
               <td className="px-4 py-3">
                 <div className="flex items-center">
                   <img

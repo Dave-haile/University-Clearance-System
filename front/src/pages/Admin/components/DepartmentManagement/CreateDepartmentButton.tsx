@@ -49,7 +49,6 @@ export const CreateDepartmentButton: React.FC<CreateDepartmentButtonProps> = ({
     newUserEmail: "",
     newUserPassword: "",
   });
-  console.log(Open)
 
   // Mock users for department head selection
   // In a real app, this would come from an API

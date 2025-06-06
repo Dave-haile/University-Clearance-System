@@ -114,4 +114,8 @@ input[type="email"]:focus~.input-text {
   .read-the-docs {
     color: #888;
   }
+  .transformStudent{
+    transform: translateY(-100px);
+    /* transition: transform 0.3s ease-in-out; */
+  }
   

@@ -9,7 +9,7 @@ export interface Student {
     year: string;
     created_at: string;
     updated_at: string;
-    clearance_requests: ClearanceRequests;
+    clearance_requests: ClearanceRequests[];
     department: Department;
 }
 

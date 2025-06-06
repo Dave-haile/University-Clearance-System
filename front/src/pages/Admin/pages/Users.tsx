@@ -278,24 +278,6 @@ const User: React.FC = () => {
               user={selectedUser}
               onClose={handleCloseDeleteDialog}
             />
-            {/* <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <UserTable
-                users={currentUsers}
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onSort={handleSort}
-                onEditUser={() => {}}
-                onDeleteUser={() => {}}
-              />
-            </div>
-
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            )} */}
           </>
         )}
       </div>

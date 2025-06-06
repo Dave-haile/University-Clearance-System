@@ -1,9 +1,9 @@
 import { useState } from "react";
-import useFetchClearanceRequests from "../components/ApproveClearance";
+import useFetchClearanceRequests from "../../../components/Staff/components/ApproveClearance";
 import axiosClient from "../../../services/axiosBackend";
 
 const LibraryApproval = () => {
-    const { requests, loading, error, fetchClearanceRequests } = useFetchClearanceRequests("registrar");
+    const { requests, loading, error, fetchClearanceRequests } = useFetchClearanceRequests("department_head");
     const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
     const [status, setStatus] = useState("approved");
     const [remarks, setRemarks] = useState("");
@@ -12,7 +12,7 @@ const LibraryApproval = () => {
     const handleApproval = async (id: number) => {
         try {
             await axiosClient.post(`/approve-clearance/${id}`, {
-                staff_role: "registrar",
+                staff_role: "department_head",
                 status,
                 remarks,
             });

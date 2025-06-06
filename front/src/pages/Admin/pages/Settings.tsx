@@ -3,15 +3,21 @@ import MainLayout from "../components/layout/MainLayout";
 import { PageHeader } from "../components/layout/PageHeader";
 import { useAuth } from "../../../context/authContext";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../../components/ui/avatar";
 import axiosClient from "@/services/axiosBackend";
 import { showError } from "@/hooks/toast";
+import axios from "axios";
 
 const Settings = () => {
   const { user } = useAuth();
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    profileImage: null as File | null,
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -30,13 +36,23 @@ const Settings = () => {
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(profileForm);
     try {
-      const response = await axiosClient.put("/update-profile", profileForm);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/update-profile`,
+        profileForm,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       console.log(response.data);
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log(error);
-      showError('Error While Updating Profile')
+      showError("Error While Updating Profile");
     }
   };
 
@@ -62,12 +78,15 @@ const Settings = () => {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setProfileImage(imageUrl);
+      setProfileForm({
+        ...profileForm,
+        profileImage: file,
+      });
     }
   };
 
   const handleNotificationUpdate = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
     setTimeout(() => {
       toast.success("Notification preferences updated");
     }, 500);

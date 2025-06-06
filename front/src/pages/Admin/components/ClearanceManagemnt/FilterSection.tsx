@@ -1,13 +1,12 @@
-
 import { Input } from "../../../../components/ui/input";
 import { Button } from "../../../../components/ui/button";
-import { 
+import {
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "../../../../components/ui/select";
 import { Department } from "@/types";
 
@@ -30,7 +29,7 @@ const FilterSection = ({
   departments,
   searchQuery,
   setSearchQuery,
-  onClearFilters
+  onClearFilters,
 }: FilterSectionProps) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm mb-6 space-y-4">
@@ -44,12 +43,9 @@ const FilterSection = ({
             className="w-full"
           />
         </div>
-        
+
         <div className="space-y-2">
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter by Status" />
             </SelectTrigger>
@@ -63,19 +59,16 @@ const FilterSection = ({
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="space-y-2">
-          <Select
-            value={departmentFilter}
-            onValueChange={setDepartmentFilter}
-          >
+          <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter by Department" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="all">All Departments</SelectItem>
-                {departments.map((department,index) => (
+                {departments.map((department, index) => (
                   <SelectItem key={index} value={department.department}>
                     {department.department}
                   </SelectItem>
@@ -85,13 +78,9 @@ const FilterSection = ({
           </Select>
         </div>
       </div>
-      
+
       <div className="flex justify-end">
-        <Button
-          variant="outline"
-          onClick={onClearFilters}
-          className="text-sm"
-        >
+        <Button variant="outline" onClick={onClearFilters} className="text-sm">
           Clear Filters
         </Button>
       </div>

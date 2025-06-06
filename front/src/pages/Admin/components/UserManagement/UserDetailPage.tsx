@@ -21,7 +21,6 @@ import { generateAvatar } from "../../utils/avatarGenerator";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  // const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] =
     useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

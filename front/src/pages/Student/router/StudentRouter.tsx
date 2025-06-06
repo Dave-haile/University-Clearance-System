@@ -1,6 +1,8 @@
 import { Route, Routes, } from "react-router-dom"
 import Dashboard from "../pages/Dashboard"
 import SubmitClearance from "../pages/SubmitClearance"
+import ClearanceHistory from "../pages/ClearanceHistory"
+import Profile from "../pages/Profile"
 
 const StudentRouter = () => {
   return (
@@ -8,9 +10,8 @@ const StudentRouter = () => {
         <Route path="/" element={<Dashboard />}  />
         <Route path="/dashboard" element={<Dashboard/>} />
         <Route path="/submit-clearance" element={<SubmitClearance/>}/>
-        <Route path="/clearance-progress" element={'hello'}/>
-        <Route path="/messages" element={<div>message</div>}  />
-        <Route path="/profile" element={<div>Profile</div>}  />
+        <Route path="/clearance-history" element={<ClearanceHistory/>}/>
+        <Route path="/profile" element={<Profile/>}  />
     </Routes>
   )
 }

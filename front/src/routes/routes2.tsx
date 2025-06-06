@@ -2,15 +2,14 @@ import { Routes, Route } from "react-router-dom";
 import LoginExample from "../components/Login/Example";
 import Unauthorized from "../pages/Other/Unauthorized";
 import ProtectedRoute from "./ProtectedRoute";
-import { DepartmentHead } from "../components/Staff/Page/DepartmentHead";
+import { DepartmentHead } from "../pages/Staff/Page/DepartmentHead";
 import NotFound from "../Moke/NotFound";
 import GuestLayout from "../components/Home/GuestLayout";
 import ClearanceForm2 from "../components/ClearanceForm/ClearanceForm2";
 import AdminRoutes from "../pages/Admin/router/AdminRouter";
 import CreateNewCollegeDepartment from "../pages/Admin/components/DepartmentManagement/CreatNewCollegeDepartment";
-import LibraryApproval from "../components/Staff/Page/Library";
+import LibraryApproval from "../pages/Staff/Page/Library";
 import StudentRouter from "@/pages/Student/router/StudentRouter";
-import SubmitClearance from "@/pages/Student/pages/SubmitClearance";
 // import Toast from "../Moke/toast";
 
 function AppRouter() {
@@ -47,7 +46,7 @@ function AppRouter() {
       >
       </Route>
       <Route element={<ProtectedRoute allowedRoles={["department_head"]} />}>
-        <Route path="/staff/department_head" element={<LibraryApproval />} />
+        <Route path="/staff/department_head/*" element={<DepartmentHead />} />
       </Route>
       <Route element={<ProtectedRoute allowedRoles={["library"]} />}>
         <Route path="/staff/libarary" element={<LibraryApproval />} />

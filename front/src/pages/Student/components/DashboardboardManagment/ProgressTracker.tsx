@@ -34,6 +34,9 @@ const ProgressTracker = ({ approvals }: ClearanceStatusCardProps) => {
     },
   ];
 
+  const rejectedApproval = approvalSteps.find(
+    (step) => step.status?.status === "rejected"
+  );
   return (
     <Card>
       <CardHeader>
@@ -77,11 +80,19 @@ const ProgressTracker = ({ approvals }: ClearanceStatusCardProps) => {
                     <StatusIndicator status={step?.status?.status} showText />
                   </div>
                   <p className="mt-1 text-sm text-gray-500">
-                    {step?.status?.status === "approved"
-                      ? `${step?.name} department has approved your clearance.`
-                      : step?.status?.status === "rejected"
-                      ? `${step?.name} department requires additional action.`
-                      : `Waiting for approval from ${step?.name} department.`}
+                    {step?.status?.status === "approved" ? (
+                      `${step?.name} department has approved your clearance.`
+                    ) : step?.status?.status === "rejected" ? (
+                      <>
+                        {step?.name} rejected because{" "}
+                        <span className="font-bold">
+                          {rejectedApproval?.status.remarks}
+                        </span>
+                        .
+                      </>
+                    ) : (
+                      `Waiting for approval from ${step?.name} department.`
+                    )}
                   </p>
                 </div>
               </div>

@@ -51,7 +51,7 @@ export default function Footer() {
             <div>
               <h3 className="text-xl font-bold mb-4">Connect With Us</h3>
               <div className="flex space-x-4">
-                <Link to="/loginOrignal" className="hover:text-blue-400">
+                <Link to="/staff/department_head" className="hover:text-blue-400">
                   <Facebook className="h-6 w-6" />
                 </Link>
                 <Link to="/forget-password" className="hover:text-blue-400">

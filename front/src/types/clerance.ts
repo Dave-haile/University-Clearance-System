@@ -39,11 +39,11 @@ export interface ClearanceRequests {
   student_id: string;
   status: "approved" | "pending" | "rejected";
   approvals: {
-    department_head: boolean | null;
-    library: boolean | null;
-    cafeteria: boolean | null;
-    proctor: boolean | null;
-    registrar: boolean | null;
+    department_head: ApprovalClearanceStatusCard;
+    library: ApprovalClearanceStatusCard;
+    cafeteria: ApprovalClearanceStatusCard;
+    proctor: ApprovalClearanceStatusCard;
+    registrar: ApprovalClearanceStatusCard;
   };
   year: string;
   semester: string;
@@ -94,7 +94,13 @@ export interface ApprovalDotsProps {
   approvals: ApprovalsProps | string | null; 
 }
 
-export type ApprovalStatus = boolean | null;
+export interface ApprovalStatus {
+  approved_by: User | null; 
+  status: ClearanceStatus;
+  name: string;
+  reason: string | null;
+  timeStamp: string | null
+}
 export interface ApprovalClearanceStatusCard {
   department_head: ApprovalStatus;
   library: ApprovalStatus;
@@ -104,3 +110,29 @@ export interface ApprovalClearanceStatusCard {
   [key: string]: ApprovalStatus; // Index signature for additional properties
 }
 export type ClearanceStatus = "approved" | "pending" | "rejected";
+
+export interface ApprovalsForReject {
+  approved_by: User | null; 
+  status: ClearanceStatus;
+  timeStamp: string | null
+  remarks: string| null;
+}
+export interface ApprovalClearanceStatusCard2{
+    department_head: ApprovalClearanceStatusCard;
+    library: ApprovalClearanceStatusCard;
+    cafeteria: ApprovalClearanceStatusCard;
+    proctor: ApprovalClearanceStatusCard;
+    registrar: ApprovalClearanceStatusCard;
+}
+
+export interface ApprovalStep {
+  id: string;
+  name: string;
+  status: ApprovalStatus | null;
+}
+export interface ApprovalStatus {
+  status: ClearanceStatus;
+  remarks: string | null;
+  timestamp: string;
+  approved_by: User | null;
+}

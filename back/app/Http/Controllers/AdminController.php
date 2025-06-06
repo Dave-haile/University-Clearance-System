@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-use function Laravel\Prompts\table;
-
 class AdminController extends Controller
 {
     public function index()
@@ -180,12 +178,6 @@ class AdminController extends Controller
 
         return response()->json(compact('user', 'clearances'));
     }
-    // public function show($id)
-    // {
-    //     $user = User::with(['staff.department', 'student.department'])->findOrFail($id);
-    //     $clearances = ClearanceRequest::where('student_id', $user->student->student_id ?? null)->get();
-    //     return response()->json(compact('user', 'clearances'));
-    // }
     public function resetPassword(Request $request, $id)
     {
         $request->validate([

@@ -37,7 +37,7 @@ export default function SubmitClearance() {
   }, []);
   return (
     <MainLayout>
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full max-w-8xl mx-auto">
         <h1 className="text-2xl md:text-3xl font-bold mb-6">
           Submit Clearance Request
         </h1>
@@ -67,7 +67,7 @@ export default function SubmitClearance() {
             </CardContent>
           </Card>
         ) : (
-          <ClearanceRequestForm studentData={studentData[0]} />
+          <ClearanceRequestForm studentData={studentData!} />
         )}
       </div>
     </MainLayout>
