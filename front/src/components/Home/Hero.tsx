@@ -1,7 +1,9 @@
+import { useAuth } from "@/context/authContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
-  const navigator = useNavigate()
+  const { user } = useAuth();
+  const navigator = useNavigate();
   return (
     <div className="pt-24 pb-16 bg-gradient-to-br from-blue-50 to-white">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
@@ -10,12 +12,20 @@ export default function Hero() {
             Simplifying University Clearance, One Step at a Time
           </h1>
           <p className="text-lg text-gray-600 mb-8">
-            Say goodbye to manual paperwork! Our digital clearance system streamlines
-            the process for students, staff, and administrators.
+            Say goodbye to manual paperwork! Our digital clearance system
+            streamlines the process for students, staff, and administrators.
           </p>
-          <button onClick={()=>{
-            navigator('/StudentForm')
-          }} className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors shadow-lg">
+          <button
+            onClick={() => {
+              console.log(user?.role);
+              if (user?.role === "student")
+                return navigator("/student/submit-clearance");
+              if (user?.role === "department_head")
+                return navigator("/department_head/dashboard");
+              if (user?.role === "admin") return navigator("/admin/Dashbord");
+            }}
+            className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors shadow-lg"
+          >
             Get Started
           </button>
         </div>

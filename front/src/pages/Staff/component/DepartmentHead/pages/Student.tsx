@@ -8,12 +8,13 @@ import {
   SortDirection,
 } from "@/types/user";
 import { UserPlus } from "lucide-react";
-import CreateUserDialog from "@/pages/Admin/components/UserManagement/CreateUserDialog";
 import EditUserDialog from "@/pages/Admin/components/UserManagement/EditUserDialog";
 import DeleteUserDialog from "@/pages/Admin/components/UserManagement/DeleteUserDialog";
 import { showError } from "@/hooks/toast";
 import UserTable from "@/pages/Admin/components/UserManagement/UserTable";
 import axiosClient from "@/services/axiosBackend";
+// import StudentRegistration from "@/components/Staff/components/StudentAccountCreation";
+// import CreateUserDialog from "../DashboardComponents/CreateUserDialog";
 
 const ITEMS_PER_PAGE = 15;
 
@@ -150,13 +151,13 @@ const Student: React.FC = () => {
             </h1>
           </div>
           <div className="flex space-x-4">
-            <button
+            {/* <button
               onClick={() => handleOpenCreateDialog()}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               <UserPlus size={18} className="mr-2" />
               Create New Student
-            </button>
+            </button> */}
             <button
               onClick={handleRefresh}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 flex items-center"
@@ -263,10 +264,16 @@ const Student: React.FC = () => {
           </>
         )}
       </div>
-      <CreateUserDialog
+      {/* <CreateUserDialog
         open={isCreateDialogOpen}
         onClose={handleCloseCreateDialog}
-      />
+      /> */}
+      {/* {isCreateDialogOpen && (
+        <CreateUserDialog
+          open={isCreateDialogOpen}
+          onClose={handleCloseCreateDialog}
+        />
+      )} */}
     </MainLayout>
   );
 };

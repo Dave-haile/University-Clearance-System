@@ -42,7 +42,6 @@ const navItems = [
     href: "/staff/department_head/student",
   },
   { name: "Profile", icon: User, href: "/staff/department_head/profile" },
-  { name: "Settings", icon: Settings, href: "/staff/department_head/settings" },
 ];
 
 export function AppSidebar() {

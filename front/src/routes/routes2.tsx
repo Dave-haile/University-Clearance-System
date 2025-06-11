@@ -19,8 +19,7 @@ function AppRouter() {
       <Route path="/login" element={<LoginExample />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<GuestLayout />} />
-      <Route path="/about" element={<CreateNewCollegeDepartment/>}/>
-      {/* <Route path="/contact" element={<SubmitClearance/>}/> */}
+      <Route path="/about" element={<CreateNewCollegeDepartment />} />
 
       {/* Protected routes - most specific first */}
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
@@ -43,8 +42,7 @@ function AppRouter() {
             ]}
           />
         }
-      >
-      </Route>
+      ></Route>
       <Route element={<ProtectedRoute allowedRoles={["department_head"]} />}>
         <Route path="/staff/department_head/*" element={<DepartmentHead />} />
       </Route>
