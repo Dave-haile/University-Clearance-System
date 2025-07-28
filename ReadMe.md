@@ -25,7 +25,6 @@ A full-stack web application built to digitize the manual clearance process in u
 
 ### Backend
 - **Laravel 11**
-- **Inertia.js** (for future compatibility)
 - **PostgreSQL** as database
 - **Axios** for API communication
 
@@ -34,7 +33,8 @@ A full-stack web application built to digitize the manual clearance process in u
 ## 🔐 Roles & Permissions
 
 - **Student:** Can submit clearance requests and track progress.
-- **Registrar:** Can view all student requests and close clearance.
+- **Admin**: ** Can view all student requests and close clearance.
+- **Registrar:** Final approval
 - **Department Head:** Approves academic clearance.
 - **Library Staff:** Clears if no books are due.
 - **Cafeteria Staff:** Checks for unpaid dues.
@@ -57,4 +57,24 @@ A full-stack web application built to digitize the manual clearance process in u
 
 ```bash
 git clone https://github.com/YourUsername/clearance-system.git
-cd clearance-system
+cd University-clearance-system
+ open 2 terminals or CMD based on your machine 
+on the first
+```bash
+cd front
+```bash
+npm i
+```bash
+npm run dev
+
+on the second terminal 
+```bash
+cd back
+```bash
+composer install
+```bash
+php artisan serve
+
+
+
+enjoy
