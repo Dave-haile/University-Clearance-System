@@ -115,6 +115,7 @@ http://localhost:8000
 username "admin@university.com"
 password "adminpass"
 
+# Create any user by going to the Users tab
 ✅ Quick Test
 Run both frontend and backend servers.
 
