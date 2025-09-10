@@ -125,9 +125,25 @@ Login with a test user (from seeded database if available).
 
 Explore role-based dashboards:
 
+Landing Page
+![Landing Page](docs/images/Screenshot 2025-09-10 154502.png)
+
+Admin Dashboard
+![Admin Page](docs/images/Screenshot 2025-09-10 151145.png)
+![Admin Page](docs/images/Screenshot 2025-09-10 151349.png)
+![Admin Page](docs/images/Screenshot 2025-09-10 151435.png)
+![Admin Page](docs/images/Screenshot 2025-09-10 151515.png)
+![Admin Page](docs/images/Screenshot 2025-09-10 151534.png)
+
 Student Dashboard
+![Student Page](docs/images/Screenshot 2025-09-10 153810.png)
+![Student Page](docs/images/Screenshot 2025-09-10 150937.png)
+![Student Page](docs/images/Screenshot 2025-09-10 151038.png)
 
 Department Head Panel
+![Department Head Page](docs/images/Screenshot 2025-09-10 153810.png)
+![Department Head Page](docs/images/Screenshot 2025-09-10 150937.png)
+![Department Head Page](docs/images/Screenshot 2025-09-10 151038.png)
 
 Registrar Panel
 
