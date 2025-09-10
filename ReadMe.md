@@ -125,25 +125,21 @@ Login with a test user (from seeded database if available).
 
 Explore role-based dashboards:
 
-Landing Page
-![Landing Page](docs/images/Screenshot 2025-09-10 154502.png)
+# Landing Page
+![Landing-Page](docs/images/Screenshot_2025-09-10_154502.png)
 
-Admin Dashboard
-![Admin Page](docs/images/Screenshot 2025-09-10 151145.png)
-![Admin Page](docs/images/Screenshot 2025-09-10 151349.png)
-![Admin Page](docs/images/Screenshot 2025-09-10 151435.png)
-![Admin Page](docs/images/Screenshot 2025-09-10 151515.png)
-![Admin Page](docs/images/Screenshot 2025-09-10 151534.png)
+# Admin Dashboard
+![Admin-Dashboard-1](docs/images/Screenshot_2025-09-10_151145.png)
+![Admin-Dashboard-2](docs/images/Screenshot_2025-09-10_151349.png)
+![Admin-Dashboard-3](docs/images/Screenshot_2025-09-10_151435.png)
 
-Student Dashboard
-![Student Page](docs/images/Screenshot 2025-09-10 153810.png)
-![Student Page](docs/images/Screenshot 2025-09-10 150937.png)
-![Student Page](docs/images/Screenshot 2025-09-10 151038.png)
+# Student Dashboard
+![Student-Dashboard-1](docs/images/Screenshot_2025-09-10_153810.png)
+![Student-Dashboard-2](docs/images/Screenshot_2025-09-10_150937.png)
 
-Department Head Panel
-![Department Head Page](docs/images/Screenshot 2025-09-10 153810.png)
-![Department Head Page](docs/images/Screenshot 2025-09-10 150937.png)
-![Department Head Page](docs/images/Screenshot 2025-09-10 151038.png)
+# Department Head Panel
+![Department-Head-1](docs/images/Screenshot_2025-09-10_153810.png)
+![Department-Head-2](docs/images/Screenshot_2025-09-10_150937.png)
 
 Registrar Panel
 
