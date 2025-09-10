@@ -111,6 +111,10 @@ php artisan serve
 👉 The backend will be available at:
 http://localhost:8000
 
+# Login as Admin using
+username "admin@university.com"
+password "adminpass"
+
 ✅ Quick Test
 Run both frontend and backend servers.
 
