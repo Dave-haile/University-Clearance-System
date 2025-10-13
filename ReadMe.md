@@ -168,7 +168,7 @@ Cafeteria Panel
 👨‍💻 Author
 Dawit Haile Sebho
 Computer Science Student @ Injibara University
-📧 Email: davehaile44@gmail.com
+📧 Email: dawit.s.haile@gmail.com
 🌐 GitHub: Dave-haile
 
 📌 Future Improvements
