@@ -47,7 +47,6 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 # -------------------
 RUN php artisan migrate --force
 
-RUN php artisan db:seed
 
 # -------------------
 # Cache config and routes (optional but recommended)
@@ -63,4 +62,4 @@ EXPOSE 10000
 # -------------------
 # Start Laravel server
 # -------------------
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+CMD php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=10000
