@@ -8,6 +8,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Models\ClearanceRequest;
 
 Route::post('/create-student', [AuthController::class, 'Signup']);
 
@@ -60,3 +61,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/Allclearance-requsets', [ClearanceRequestController::class, 'display']);
 Route::post('/upload-students', [AuthController::class, 'upload']);
+Route::get('/test-departments', function () {
+    return ClearanceRequest::all();
+});
