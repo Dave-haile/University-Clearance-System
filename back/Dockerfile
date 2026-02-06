@@ -18,4 +18,4 @@ RUN chmod +x start.sh
 
 EXPOSE 10000
 
-CMD ["sh", "entrypoint.sh"]
+CMD ["sh", "start.sh"]
