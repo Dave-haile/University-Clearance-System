@@ -14,4 +14,8 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+RUN chmod +x start.sh
+
 EXPOSE 10000
+
+CMD ["sh", "entrypoint.sh"]
