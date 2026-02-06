@@ -21,7 +21,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $imageDirectory = public_path('profiles');
-        $images = File::files($imageDirectory);
+
+$imageUrl = null;
+if (File::exists($imageDirectory)) {
+    $images = File::files($imageDirectory);
+    if (count($images) > 0) {
+        $randomImage = collect($images)->random();
+        $imageUrl = url('profiles/' . $randomImage->getFilename());
+    }
+}
+        
         if (count($images) === 0) {
             $imageUrl = null;
         } else {
@@ -32,7 +41,7 @@ class DatabaseSeeder extends Seeder
             DepartmentsTableSeeder::class,
             StaffTableSeeder::class,
         ]);
-        $department = Department::where('department', 'Computer Science')->first();
+        $department = Department::where('name', 'Computer Science')->first();
 
         $studentUser = User::create([
             'name' => 'John Doe',
