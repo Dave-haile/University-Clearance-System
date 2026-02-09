@@ -7,5 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    dump(User::all());
+    dump(Department::all());
+    dump(ClearanceRequest::all());
     return view('welcome');
 });
