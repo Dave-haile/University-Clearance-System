@@ -61,7 +61,7 @@ class StaffTableSeeder extends Seeder
             [
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Emily Davis',
-                    'email' => 'emil@gmail.com',
+                    'email' => 'emily33@gmail.com',
                     'password' => Hash::make('password123'),
                     'role' => 'registrar',
                     'profile_image' => $imageUrl,
