@@ -6,6 +6,8 @@ use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 
 class DepartmentsTableSeeder extends Seeder
 {
@@ -60,14 +62,29 @@ class DepartmentsTableSeeder extends Seeder
 
         DB::table('departments')->insert($departments);
 
+        // Get image for profile (same logic as in other seeders)
+        $imageDirectory = public_path('profiles');
+        $images = File::files($imageDirectory);
+        $imageUrl = count($images)
+            ? url('profiles/' . collect($images)->random()->getFilename())
+            : null;
+
         $departmentsInDb = DB::table('departments')->get();
 
         foreach ($departmentsInDb as $index => $department) {
-
             if ($index % 5 === 0) {
-                $user = User::factory()->create([
-                    "email" => fake()->unique()->safeEmail(),
+                // Create department head user manually (without factory)
+                $user = User::create([
+                    'name' => 'Department Head ' . ($index + 1),
+                    'username' => null,
+                    'email' => 'dept_head_' . ($index + 1) . '@clearance.com',
+                    'email_verified_at' => now(),
+                    'password' => Hash::make('password'),
                     'role' => 'department_head',
+                    'profile_image' => $imageUrl,
+                    'remember_token' => null,
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
 
                 Staff::create([
