@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index']);
     Route::get('/admin/users', [AdminController::class, 'users']);
     Route::get('/admin/clearanceRequests', [AdminController::class, 'displayRequests']);
+    Route::get('/admin/clearanceRequests/{clearanceid}', [AdminController::class, 'displaySingleClearace']);
     Route::get('/admin/users/{userId}', [AdminController::class, 'show']);
     Route::post('/admin/archive-clearance-requests', [AdminController::class, 'archiveClearanceRequests']);
     Route::post('/admin/users/{id}/update', [AdminController::class, 'update']);

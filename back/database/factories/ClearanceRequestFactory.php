@@ -181,40 +181,39 @@ class ClearanceRequestFactory extends Factory
     //     ];
     // }
     public function definition(): array
-{
-    $student = Student::inRandomOrder()->first();
-    $department = $student->department;
+    {
+        $student = Student::inRandomOrder()->first();
+        $department = $student->department;
 
-    // Fresh request: no approvals yet
-    $approvals = [
-        'department_head' => null,
-        'library' => null,
-        'cafeteria' => null,
-        'proctor' => null,
-        'registrar' => null,
-    ];
+        // Fresh request: no approvals yet
+        $approvals = [
+            'department_head' => null,
+            'library' => null,
+            'cafeteria' => null,
+            'proctor' => null,
+            'registrar' => null,
+        ];
 
-    return [
-        'student_id' => $student->student_id,
-        'sex' => $this->faker->randomElement(['Male', 'Female']),
-        'status' => 'pending',
-        // 'approvals' => json_encode($approvals),
-        'year' => $student->year,
-        'semester' => $this->faker->randomElement(['First', 'Second']),
-        'section' => $this->faker->randomElement(['A', 'B', 'C']),
-        'department_id' => $department->id,
-        'academic_year' => $this->faker->year() . '-' . ($this->faker->year() + 1),
-        'last_day_class_attended' => $this->faker->date(),
-        'reason_for_clearance' => $this->faker->sentence(),
-        'cafe_status' => $this->faker->randomElement(['cafe', 'non-cafe']),
-        'dorm_status' => $this->faker->randomElement(['dorm', 'non-dorm']),
-        'current_step' => 'department_head',
-        'department_head_approved' => null,
-        'library_approved' => null,
-        'cafeteria_approved' => null,
-        'proctor_approved' => null,
-        'registrar_approved' => null,
-    ];
-}
-
+        return [
+            'student_id' => $student->student_id,
+            'sex' => $this->faker->randomElement(['Male', 'Female']),
+            'status' => 'pending',
+            // 'approvals' => json_encode($approvals),
+            'year' => $student->year,
+            'semester' => $this->faker->randomElement(['First', 'Second']),
+            'section' => $this->faker->randomElement(['A', 'B', 'C']),
+            'department_id' => $department->id,
+            'academic_year' => $this->faker->year() . '-' . ($this->faker->year() + 1),
+            'last_day_class_attended' => $this->faker->date(),
+            'reason_for_clearance' => $this->faker->sentence(),
+            'cafe_status' => $this->faker->randomElement(['cafe', 'non-cafe']),
+            'dorm_status' => $this->faker->randomElement(['dorm', 'non-dorm']),
+            'current_step' => 'department_head',
+            'department_head_approved' => null,
+            'library_approved' => null,
+            'cafeteria_approved' => null,
+            'proctor_approved' => null,
+            'registrar_approved' => null,
+        ];
+    }
 }

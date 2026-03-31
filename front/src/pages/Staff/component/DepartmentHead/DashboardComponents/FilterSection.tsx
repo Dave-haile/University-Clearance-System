@@ -8,14 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Department } from "@/types";
 
 interface FilterSectionProps {
   statusFilter: string;
   setStatusFilter: (status: string) => void;
   departmentFilter: string;
   setDepartmentFilter: (department: string) => void;
-  departments: Department[];
+  departments: string[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onClearFilters: () => void;

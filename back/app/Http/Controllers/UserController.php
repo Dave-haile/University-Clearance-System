@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\ApiCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -10,31 +11,46 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
+    public function __construct(private ApiCacheService $apiCache) {}
     public function updateProfilePicture(Request $request)
     {
         $request->validate([
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            "profile_image" => "nullable|image|mimes:jpg,jpeg,png|max:2048",
         ]);
 
         $authUser = Auth::user();
         $user = User::find($authUser->id);
 
-        if ($request->hasFile('profile_image')) {
+        if ($request->hasFile("profile_image")) {
             // Optional: delete old image
             if ($user->profile_image) {
                 Storage::delete($user->profile_image);
             }
 
-            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $path = $request
+                ->file("profile_image")
+                ->store("profile_images", "public");
             $user->profile_image = $path;
         }
 
         $user->save();
 
+        $this->apiCache->bump([
+            "student_dashboard",
+            "student_all_data",
+            "student_profile",
+            "staff_profile",
+            "admin_users",
+            "users",
+            "students",
+            "staff",
+            "user:" . $user->id,
+        ]);
+
         return response()->json([
-            'message' => 'Profile picture updated successfully.',
-            'profile_image_url' => $user->profile_image
-                ? asset('storage/' . $user->profile_image)
+            "message" => "Profile picture updated successfully.",
+            "profile_image_url" => $user->profile_image
+                ? asset("storage/" . $user->profile_image)
                 : null,
         ]);
     }
@@ -45,33 +61,66 @@ class UserController extends Controller
         $user = User::find($authUser->id); // Ensure $user is an Eloquent model instance
 
         $request->validate([
-            'name' => 'nullable|string|max:255',
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
-            'email' => 'nullable|email|unique:users,email,' . $user->id,
-            'profileImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            "name" => "nullable|string|max:255",
+            "username" =>
+                "nullable|string|max:255|unique:users,username," . $user->id,
+            "email" => "nullable|email|unique:users,email," . $user->id,
+            "profileImage" => "nullable|image|mimes:jpeg,png,jpg,gif|max:2048",
         ]);
 
-        if ($request->filled('name')) {
+        if ($request->filled("name")) {
             $user->name = $request->name;
         }
-        if ($request->filled('username')) {
+        if ($request->filled("username")) {
             $user->username = $request->username;
         }
-        if ($request->filled('email')) {
+        if ($request->filled("email")) {
             $user->email = $request->email;
         }
 
-        if ($request->hasFile('profileImage')) {
-            if ($user->profile_image && Storage::exists(str_replace(asset('storage') . '/', '', $user->profile_image))) {
-                Storage::delete(str_replace(asset('storage') . '/', '', $user->profile_image));
+        if ($request->hasFile("profileImage")) {
+            if (
+                $user->profile_image &&
+                Storage::exists(
+                    str_replace(
+                        asset("storage") . "/",
+                        "",
+                        $user->profile_image,
+                    ),
+                )
+            ) {
+                Storage::delete(
+                    str_replace(
+                        asset("storage") . "/",
+                        "",
+                        $user->profile_image,
+                    ),
+                );
             }
 
-            $path = $request->file('profileImage')->store('profile_images', 'public');
-            $user->profile_image = asset('storage/' . $path); // Store full URL in the DB
+            $path = $request
+                ->file("profileImage")
+                ->store("profile_images", "public");
+            $user->profile_image = asset("storage/" . $path); // Store full URL in the DB
         }
 
         $user->save();
 
-        return response()->json(['message' => 'Profile updated successfully', 'user' => $user]);
+        $this->apiCache->bump([
+            "student_dashboard",
+            "student_all_data",
+            "student_profile",
+            "staff_profile",
+            "admin_users",
+            "users",
+            "students",
+            "staff",
+            "user:" . $user->id,
+        ]);
+
+        return response()->json([
+            "message" => "Profile updated successfully",
+            "user" => $user,
+        ]);
     }
 }

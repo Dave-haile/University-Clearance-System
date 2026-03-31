@@ -25,6 +25,9 @@ import { User } from "@/types/user";
 import { getFullMemberSinceDate } from "@/pages/Admin/utils/formatDate";
 import { generateAvatar } from "@/pages/Admin/utils/avatarGenerator";
 import axios from "axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
+import { queryClient } from "@/lib/queryClient";
 
 interface StudentProfileProps {
   userData?: User | null;
@@ -32,24 +35,23 @@ interface StudentProfileProps {
 }
 
 export default function Profile() {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<User>();
+  const fetchProfile = async (): Promise<User> => {
+    const response = await axiosClient.get("/staff/profile/show");
+    return response.data;
+  };
+
+  const {
+    data,
+    isLoading: loading,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.staff.profile,
+    queryFn: fetchProfile,
+  });
 
   const prfileFetch = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosClient.get("/staff/profile/show");
-      console.log(response.data);
-      setData(response.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+    await refetch();
   };
-  useEffect(() => {
-    prfileFetch();
-  }, []);
 
   if (loading && !data) {
     return (
@@ -88,6 +90,15 @@ function StudentProfile({ userData, onRefresh }: StudentProfileProps) {
     new_password_confirmation: "",
     profileImage: null as File | null,
   });
+
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      name: userData?.name || "",
+      username: userData?.username || "",
+      email: userData?.email || "",
+    }));
+  }, [userData]);
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -121,6 +132,47 @@ function StudentProfile({ userData, onRefresh }: StudentProfileProps) {
       reader.readAsDataURL(file);
     }
   };
+  const updateProfileMutation = useMutation({
+    mutationFn: async (form: FormData) => {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/update-profile`,
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      return response.data;
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.staff.profile }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.staff.dashboard }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.staff.clearanceRequests,
+        }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.staff.students }),
+      ]);
+      await onRefresh();
+      toast.success("Your profile information has been updated successfully.");
+      setIsEditing(false);
+      setFormData((prev) => ({
+        ...prev,
+        oldPassword: "",
+        new_password: "",
+        new_password_confirmation: "",
+        profileImage: null,
+      }));
+    },
+    onError: (error) => {
+      console.error("Update error:", error);
+      toast.error("There was a problem updating your profile.");
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -153,7 +205,7 @@ function StudentProfile({ userData, onRefresh }: StudentProfileProps) {
     form.append("new_password", formData.new_password);
     form.append(
       "new_password_confirmation",
-      formData.new_password_confirmation
+      formData.new_password_confirmation,
     );
 
     if (formData.profileImage) {
@@ -162,24 +214,7 @@ function StudentProfile({ userData, onRefresh }: StudentProfileProps) {
 
     console.log("form Data", formData);
     console.log("profile Data", formData.profileImage);
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/student/profile/update`,
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("Update response:", response.data);
-      toast.success("Your profile information has been updated successfully.");
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Update error:", error);
-      toast.error("There was a problem updating your profile.");
-    }
+    await updateProfileMutation.mutateAsync(form);
   };
   const fullData = getFullMemberSinceDate(userData?.created_at || "");
   return (
@@ -191,7 +226,10 @@ function StudentProfile({ userData, onRefresh }: StudentProfileProps) {
             <div className="flex justify-between items-center">
               <CardTitle>Student Profile</CardTitle>
               <div>
-                <Button onClick={handleRefresh} disabled={isRefreshing}>
+                <Button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing || updateProfileMutation.isPending}
+                >
                   <RefreshCcw
                     className={`w-4 h-4 mr-2 ${
                       isRefreshing ? "animate-spin" : ""

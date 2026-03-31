@@ -1,173 +1,91 @@
-import React, { useState } from "react";
-import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
-import StatusBadge from "../ClearanceManagemnt/StatusBadge";
-import { RecentRequest } from "../../../../types/dashboard";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { RecentRequest } from '../../../../types/dashboard';
+import { Link } from 'react-router-dom';
 
-interface RecentRequestsTableProps {
-  requests?: RecentRequest[];
-}
-
-const RecentRequestsTable: React.FC<RecentRequestsTableProps> = ({
-  requests,
-}) => {
-  const [sortField, setSortField] = useState<keyof RecentRequest>("created_at");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-
-  const handleSort = (field: keyof RecentRequest) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("desc");
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
-  // Sort the requests
-  const sortedRequests = [...(requests || [])].sort((a, b) => {
-    if (sortField === "created_at") {
-      const dateA = new Date(a[sortField]).getTime();
-      const dateB = new Date(b[sortField]).getTime();
-      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
-    }
-
-    if (sortField === "status") {
-      return sortDirection === "asc"
-        ? a[sortField].localeCompare(b[sortField])
-        : b[sortField].localeCompare(a[sortField]);
-    }
-
-    if (sortField === "student_id") {
-      return sortDirection === "asc"
-        ? a[sortField].localeCompare(b[sortField])
-        : b[sortField].localeCompare(a[sortField]);
-    }
-
-    return 0;
-  });
-
-  const getSortIcon = (field: keyof RecentRequest) => {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? (
-      <ChevronUp className="inline h-4 w-4" />
-    ) : (
-      <ChevronDown className="inline h-4 w-4" />
-    );
+const StatusBadge: React.FC<{ status: RecentRequest['status'] }> = ({ status }) => {
+  const styles = {
+    approved: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/50',
+    pending: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/50',
+    rejected: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900/50',
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex justify-between">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          Recent Requests
-        </h2>
-        <Link
-          className="p-3 py-[0.6] mb-3 text-white bg-blue-500 hover:bg-blue-600 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-          to="/admin/requests"
-        >
-          More <MoreHorizontal className="h-4 mt-1 w-4 " />
-        </Link>
+    <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border uppercase tracking-wider ${styles[status]}`}>
+      {status}
+    </span>
+  );
+};
+
+const RecentRequestsTable: React.FC<{ requests?: RecentRequest[] }> = ({ requests }) => {
+  return (
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col transition-colors">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Recent Clearance Submissions</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Tracking live student clearance progressions.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link to="/admin/clearance-requests">
+            <button className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 px-4 py-2 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl transition-colors">
+              View All
+            </button>
+          </Link>
+        </div>
       </div>
-      {requests?.length !== 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("student_id")}
-                >
-                  Student ID {getSortIcon("student_id")}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Student Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Department
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("status")}
-                >
-                  Status {getSortIcon("status")}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("created_at")}
-                >
-                  Requested {getSortIcon("created_at")}
-                </th>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-slate-50/50 dark:bg-slate-800/30">
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Student</th>
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Academic Year</th>
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Step</th>
+              <th className="px-6 py-4 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Status</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            {requests?.map((req) => (
+              <tr key={req.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 font-bold text-xs uppercase transition-colors">
+                      {req.student.user.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-none">{req.student.user.name}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 font-mono">{req.student_id}</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{req.year}</p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-tight">AY: {req.academic_year}</p>
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase tracking-wide">
+                    {req.current_step.replace('_', ' ')}
+                  </p>
+                </td>
+                <td className="px-6 py-4">
+                  <StatusBadge status={req.status} />
+                </td>
+                {/* <td className="px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-lg">
+                      <ExternalLink className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td> */}
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sortedRequests.map((request) => (
-                <tr
-                  key={request.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {request.student_id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {request.student.user.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {request.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <StatusBadge status={request.status} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(request.created_at)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg p-12 flex flex-col items-center justify-center text-center">
-          <div className="bg-blue-50 p-4 rounded-full mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-12 w-12 text-blue-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-medium text-gray-900 mb-2">
-            No Clearance Requests Found
-          </h3>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

@@ -18,7 +18,7 @@ import { TextArea } from "./ui/TextArea";
 import axiosClient from "../../services/axiosBackend";
 import axios from "axios";
 import { useAuth } from "../../context/authContext";
-import { MainLayout } from "@/pages/Student/components/layout/MainLayout";
+// import { MainLayout } from "@/pages/Student/components/layout/MainLayout";
 
 function ClearanceForm2() {
   const {
@@ -69,7 +69,7 @@ function ClearanceForm2() {
   };
 
   return (
-    <MainLayout>
+    // <MainLayout>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-6"
@@ -249,7 +249,7 @@ function ClearanceForm2() {
           )}
         </button>
       </form>
-    </MainLayout>
+    // </MainLayout>
   );
 }
 export default ClearanceForm2;

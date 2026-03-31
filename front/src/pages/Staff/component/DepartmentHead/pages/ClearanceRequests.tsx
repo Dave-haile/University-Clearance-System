@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { RefreshCcw } from "lucide-react";
 import { MainLayout } from "../../layout/MainLayout";
 import LoadingSpinner from "@/pages/Admin/components/ClearanceManagemnt/LoadingSpinner";
@@ -6,71 +6,65 @@ import ErrorAlert from "@/pages/Admin/components/ClearanceManagemnt/ErrorAlert";
 import EmptyState from "@/pages/Admin/components/ClearanceManagemnt/EmptyState";
 import FilterSection from "../DashboardComponents/FilterSection";
 import axiosClient from "@/services/axiosBackend";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import { Button } from "@/components/ui/button";
 import { ClearanceRequests as Clear } from "@/types/clerance";
 import ClearanceTable from "../DashboardComponents/ClearanceTable";
 
 const ClearanceRequests = () => {
-  const [clearanceRequests, setClearanceRequests] = useState<Clear[]>([]);
-  const [filteredRequests, setFilteredRequests] = useState<Clear[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
   const itemsPerPage = 10;
 
-  const uniqueDepartments = Array.from(
-    new Set(clearanceRequests.map((req) => req.department))
-  );
-
-  const loadClearanceRequests = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await axiosClient.get("/staff/displayRequests");
-      console.log("Clearance Requests Data:", data.data);
-      setClearanceRequests(data.data);
-      setTotalPages(Math.ceil(data.data.length / itemsPerPage));
-      setIsLoading(false);
-    } catch (err) {
-      setIsLoading(false);
-      setError("Failed to load clearance requests. Please try again.");
-      console.error("Error fetching clearance requests:", err);
-    }
+  const fetchClearanceRequests = async (): Promise<Clear[]> => {
+    const response = await axiosClient.get("/staff/displayRequests");
+    console.log("Clearance Requests Data:", response.data);
+    return response.data;
   };
 
-  useEffect(() => {
-    loadClearanceRequests();
-  }, []);
+  const {
+    data: clearanceRequests = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.staff.clearanceRequests,
+    queryFn: fetchClearanceRequests,
+  });
 
-  useEffect(() => {
+  const filteredRequests = useMemo(() => {
     let filtered = [...clearanceRequests];
+
     if (statusFilter !== "all") {
       filtered = filtered.filter(
-        (request) => request.year.toLowerCase() === statusFilter.toLowerCase()
+        (request) => request.year.toLowerCase() === statusFilter.toLowerCase(),
       );
     }
+
     if (departmentFilter !== "all") {
       filtered = filtered.filter(
-        (request) => request.department.department === departmentFilter
+        (request) => request.department.department === departmentFilter,
       );
     }
+
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(
         (request) =>
           request.student_id.toLowerCase().includes(query) ||
           (request.student.user.name &&
-            request.student.user.name.toLowerCase().includes(query))
+            request.student.user.name.toLowerCase().includes(query)),
       );
     }
-    setFilteredRequests(filtered);
-    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    setCurrentPage(1);
+
+    return filtered;
   }, [clearanceRequests, statusFilter, departmentFilter, searchQuery]);
+
+  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+
   const getCurrentPageItems = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -78,7 +72,11 @@ const ClearanceRequests = () => {
   };
 
   const handleRefresh = () => {
-    loadClearanceRequests();
+    setError(null);
+    refetch().catch((err) => {
+      setError("Failed to load clearance requests. Please try again.");
+      console.error("Error fetching clearance requests:", err);
+    });
   };
 
   const handleClearFilters = () => {
@@ -109,7 +107,7 @@ const ClearanceRequests = () => {
           setStatusFilter={setStatusFilter}
           departmentFilter={departmentFilter}
           setDepartmentFilter={setDepartmentFilter}
-          departments={uniqueDepartments}
+          departments={[]}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onClearFilters={handleClearFilters}

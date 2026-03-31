@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MainLayout from "../components/layout/MainLayout";
+
 import { PageHeader } from "../components/layout/PageHeader";
 import { useAuth } from "../../../context/authContext";
 import { toast } from "sonner";
@@ -46,7 +46,7 @@ const Settings = () => {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
       console.log(response.data);
       toast.success("Profile updated successfully");
@@ -93,26 +93,26 @@ const Settings = () => {
   };
 
   return (
-    <MainLayout>
+    <>
       <PageHeader
         title="Settings"
         description="Manage your account and preferences"
       />
 
-      <div className="space-y-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium mb-4">Profile Information</h2>
+      <div className="space-y-6">
+        <div className="bg-white shadow rounded-lg p-5">
+          <h2 className="text-base font-medium mb-3">Profile Information</h2>
           <form onSubmit={handleProfileUpdate}>
-            <div className="flex items-start gap-6 mb-6">
+            <div className="flex items-start gap-5 mb-5">
               <div className="flex-shrink-0">
-                <Avatar className="h-24 w-24">
+                <Avatar className="h-20 w-20">
                   <AvatarImage src={profileImage} alt={profileForm.name} />
                   <AvatarFallback>{profileForm.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="mt-2">
                   <label
                     htmlFor="profile-image"
-                    className="cursor-pointer text-sm font-medium text-primary hover:underline"
+                    className="cursor-pointer text-xs font-medium text-primary hover:underline"
                   >
                     Change Image
                   </label>
@@ -126,11 +126,11 @@ const Settings = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-grow">
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-xs font-medium text-gray-700 mb-1"
                   >
                     Full Name
                   </label>
@@ -141,7 +141,7 @@ const Settings = () => {
                     onChange={(e) =>
                       setProfileForm({ ...profileForm, name: e.target.value })
                     }
-                    className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                    className="w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                     required
                   />
                 </div>
@@ -149,7 +149,7 @@ const Settings = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
+                    className="block text-xs font-medium text-gray-700 mb-1"
                   >
                     Email Address
                   </label>
@@ -160,16 +160,16 @@ const Settings = () => {
                     onChange={(e) =>
                       setProfileForm({ ...profileForm, email: e.target.value })
                     }
-                    className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                    className="w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                     required
                   />
                 </div>
               </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-5">
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Update Profile
               </button>
@@ -178,14 +178,14 @@ const Settings = () => {
         </div>
 
         {/* Password Settings */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium mb-4">Change Password</h2>
+        <div className="bg-white shadow rounded-lg p-5">
+          <h2 className="text-base font-medium mb-3">Change Password</h2>
           <form onSubmit={handlePasswordUpdate}>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <label
                   htmlFor="current-password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-xs font-medium text-gray-700 mb-1"
                 >
                   Current Password
                 </label>
@@ -199,7 +199,7 @@ const Settings = () => {
                       current_password: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                   required
                 />
               </div>
@@ -207,7 +207,7 @@ const Settings = () => {
               <div>
                 <label
                   htmlFor="new-password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-xs font-medium text-gray-700 mb-1"
                 >
                   New Password
                 </label>
@@ -221,7 +221,7 @@ const Settings = () => {
                       new_password: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                   required
                 />
               </div>
@@ -229,7 +229,7 @@ const Settings = () => {
               <div>
                 <label
                   htmlFor="confirm-password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-xs font-medium text-gray-700 mb-1"
                 >
                   Confirm New Password
                 </label>
@@ -243,16 +243,16 @@ const Settings = () => {
                       new_password_confirmation: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full rounded-md border border-gray-300 shadow-sm px-3 py-2 text-sm focus:outline-none focus:ring-primary focus:border-primary"
                   required
                 />
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5">
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Update Password
               </button>
@@ -261,16 +261,18 @@ const Settings = () => {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium mb-4">Notification Preferences</h2>
+        <div className="bg-white shadow rounded-lg p-5">
+          <h2 className="text-base font-medium mb-3">
+            Notification Preferences
+          </h2>
           <form onSubmit={handleNotificationUpdate}>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">
+                  <h3 className="text-xs font-medium text-gray-900">
                     Email Notifications
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Receive notifications via email
                   </p>
                 </div>
@@ -286,16 +288,16 @@ const Settings = () => {
                       })
                     }
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div className="w-10 h-[22px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">
+                  <h3 className="text-xs font-medium text-gray-900">
                     Browser Notifications
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Receive notifications in your browser
                   </p>
                 </div>
@@ -311,16 +313,16 @@ const Settings = () => {
                       })
                     }
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div className="w-10 h-[22px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">
+                  <h3 className="text-xs font-medium text-gray-900">
                     Request Updates
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Get notified about clearance request updates
                   </p>
                 </div>
@@ -336,16 +338,16 @@ const Settings = () => {
                       })
                     }
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div className="w-10 h-[22px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">
+                  <h3 className="text-xs font-medium text-gray-900">
                     System Updates
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Get notified about system changes and updates
                   </p>
                 </div>
@@ -361,15 +363,15 @@ const Settings = () => {
                       })
                     }
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  <div className="w-10 h-[22px] bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-5">
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Save Preferences
               </button>
@@ -377,7 +379,7 @@ const Settings = () => {
           </form>
         </div>
       </div>
-    </MainLayout>
+    </>
   );
 };
 

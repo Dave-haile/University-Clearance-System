@@ -149,8 +149,9 @@ export interface Department {
     created_at: string | null;
     updated_at: string | null;
     department: Department | null;
+    phone_number: string;
   }
-  
+
   export interface User {
     id: number;
     name: string;
@@ -164,7 +165,36 @@ export interface Department {
     staff: Staff | null;
     student: Student | null;
   }
-  
+
   export type SortField = "name" | "created_at";
   export type SortDirection = "asc" | "desc";
-  export type UserRole = "all" | "student" | "staff" | "admin" | "department_head" | "library" | "cafeteria" | "proctor" | "registrar";
+  export type UserRole =
+    | "all"
+    | "student"
+    | "staff"
+    | "admin"
+    | "department_head"
+    | "library"
+    | "cafeteria"
+    | "proctor"
+    | "registrar";
+  export type LogLevel = "info" | "warning" | "error" | "critical";
+
+  // Added missing LogCategory type for audit categorization
+  export type LogCategory = "audit" | "security" | "system";
+
+  export interface SystemLog {
+    id: string;
+    timestamp: string;
+    level: LogLevel;
+    category: LogCategory;
+    action: string;
+    user: {
+      name: string;
+      role: string;
+      id: number;
+    } | null;
+    resource: string;
+    ip_address: string;
+    metadata: any;
+  }

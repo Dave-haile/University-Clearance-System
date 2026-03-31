@@ -1,4 +1,4 @@
-import { Department } from ".";
+import { Department } from "./department";
 
 export interface User {
   id: number;
@@ -91,15 +91,15 @@ export interface ApprovalsProps {
 }
 
 export interface ApprovalDotsProps {
-  approvals: ApprovalsProps | string | null; 
+  approvals: ApprovalsProps | string | null;
 }
 
 export interface ApprovalStatus {
-  approved_by: User | null; 
+  approved_by: User | null;
   status: ClearanceStatus;
   name: string;
   reason: string | null;
-  timeStamp: string | null
+  timeStamp: string | null;
 }
 export interface ApprovalClearanceStatusCard {
   department_head: ApprovalStatus;
@@ -112,17 +112,17 @@ export interface ApprovalClearanceStatusCard {
 export type ClearanceStatus = "approved" | "pending" | "rejected";
 
 export interface ApprovalsForReject {
-  approved_by: User | null; 
+  approved_by: User | null;
   status: ClearanceStatus;
-  timeStamp: string | null
-  remarks: string| null;
+  timeStamp: string | null;
+  remarks: string | null;
 }
-export interface ApprovalClearanceStatusCard2{
-    department_head: ApprovalClearanceStatusCard;
-    library: ApprovalClearanceStatusCard;
-    cafeteria: ApprovalClearanceStatusCard;
-    proctor: ApprovalClearanceStatusCard;
-    registrar: ApprovalClearanceStatusCard;
+export interface ApprovalClearanceStatusCard2 {
+  department_head: ApprovalClearanceStatusCard;
+  library: ApprovalClearanceStatusCard;
+  cafeteria: ApprovalClearanceStatusCard;
+  proctor: ApprovalClearanceStatusCard;
+  registrar: ApprovalClearanceStatusCard;
 }
 
 export interface ApprovalStep {

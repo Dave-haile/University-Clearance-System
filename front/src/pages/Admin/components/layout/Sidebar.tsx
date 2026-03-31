@@ -72,7 +72,7 @@ export const Sidebar = ({
   }, [isMobile, toggleCollapse]);
 
   // Close sidebar when route changes on mobile
-   useEffect(() => {
+  useEffect(() => {
     if (isMobile) {
       toggleCollapse();
     }
@@ -83,7 +83,7 @@ export const Sidebar = ({
   return (
     <div
       className={cn(
-        "bg-sidebar flex flex-col h-screen transition-all duration-300 border-r border-sidebar-border shadow-sm",
+        "bg-sidebar flex flex-col h-[100dvh] transition-all duration-300 border-r border-sidebar-border shadow-sm overflow-x-hidden",
         collapsed ? "w-[60px]" : "w-[240px]",
         className
       )}
@@ -163,3 +163,4 @@ export const Sidebar = ({
     </div>
   );
 };
+

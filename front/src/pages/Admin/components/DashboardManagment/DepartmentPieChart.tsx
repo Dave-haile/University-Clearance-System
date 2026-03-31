@@ -29,7 +29,7 @@ const COLORS = [
 
 const DepartmentPieChart: React.FC<DepartmentPieChartProps> = ({ data }) => {
   return (
-    <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+    <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">Requests by Department</h2>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">

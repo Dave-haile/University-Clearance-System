@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { StatisticsCards } from "../DashboardComponents/StatisticsCards";
 import { ClearanceRequestsTable } from "../DashboardComponents/ClearanceRequestsTable";
 import { RejectionModal } from "../DashboardComponents/RejectionModal";
 import { ClearanceChart } from "../DashboardComponents/ClearanceChart";
 import { DashboardHeader } from "../DashboardComponents/DashboardHeader";
 import axiosClient from "@/services/axiosBackend";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 import { DashboardData } from "@/types/dashboard";
 import { ClearanceRequest } from "@/types/dashboard";
 import {
@@ -18,32 +20,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@mui/material";
 import { RefreshCcw } from "lucide-react";
 import { MainLayout } from "../../layout/MainLayout";
-import RequestsBarChart from "@/pages/Admin/components/DashboardManagment/RequestsBarChart";
+import { RequestsBarChart } from "@/pages/Admin/components/DashboardManagment/RequestsBarChart";
 import { HandleApproval } from "@/pages/Staff/hooks/handleApproval";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState<DashboardData>();
   const [selectedRequest, setSelectedRequest] =
     useState<ClearanceRequest | null>(null);
-  // const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosClient.get("/staff/dashboard");
-      setDashboardData(response.data);
-      console.log("Dashboard data fetched successfully:", response.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchDashboardData = async (): Promise<DashboardData> => {
+    const response = await axiosClient.get("/staff/dashboard");
+    return response.data;
   };
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+
+  const {
+    data: dashboardData,
+    isLoading: loading,
+    refetch,
+  } = useQuery<DashboardData>({
+    queryKey: queryKeys.staff.dashboard,
+    queryFn: fetchDashboardData,
+  });
 
   if (loading) {
     return (
@@ -91,14 +88,14 @@ const Dashboard = () => {
     if (!selectedRequest) return;
     if (selectedRequest) {
       console.log(
-        `Request ${selectedRequest.id} rejected with reason: ${reason}`
+        `Request ${selectedRequest.id} rejected with reason: ${reason}`,
       );
     }
     await HandleApproval(
       selectedRequest.id,
       "department_head",
       "rejected",
-      reason
+      reason,
     );
 
     setShowRejectionModal(false);
@@ -113,7 +110,7 @@ const Dashboard = () => {
   };
 
   const handleRefresh = () => {
-    fetchDashboardData();
+    void refetch();
   };
 
   if (!dashboardData) {

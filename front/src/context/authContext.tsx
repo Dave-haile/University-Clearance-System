@@ -8,6 +8,7 @@ import {
 import { User } from "../types/user";
 import axiosClient from "@/services/axiosBackend";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -19,6 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (user: User, token: string) => {
+    queryClient.clear();
     setUser(user);
     setToken(token);
     localStorage.setItem("token", token);
@@ -46,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    queryClient.clear();
     try {
       const response = await axiosClient.post("/logout");
       toast.success(response.data.message || "Looged out Successfully");

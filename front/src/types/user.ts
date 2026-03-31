@@ -28,6 +28,7 @@ export interface Staff {
   updated_at: string | null;
   department?: Department | null;
   user: User | null;
+  phone_number: string;
 }
 
 export interface Student {
@@ -54,6 +55,7 @@ export interface User {
   updated_at: string | null;
   staff: Staff | null;
   student: Student | null;
+  phone_number: string;
 }
 export type SortField = "name" | "created_at";
 export type SortDirection = "asc" | "desc";

@@ -1,8 +1,8 @@
 import Header from "./landing/Header";
-import HeroSection from "./landing/HeroSection";
-import ProcessSection from "./landing/ProcessSection";
-import FeaturesSection from "./landing/FeaturesSection";
-import HowItWorksSection from "./landing/HowItWorksSection";
+import Hero from "./landing/Hero";
+import ProcessSection from "./landing/Process";
+import FeaturesSection from "./landing/Features";
+import HowItWorksSection from "./landing/HowItWorks";
 import Footer from "./landing/Footer";
 import { useAuth } from "@/context/authContext";
 import { GoogleLoader } from "../ui/GoogleLoder";
@@ -22,7 +22,7 @@ const GuestLayout = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main>
-        <HeroSection />
+        <Hero />
         <ProcessSection />
         <FeaturesSection />
         <HowItWorksSection />

@@ -7,6 +7,7 @@ use App\Http\Requests\LoginRequest;
 use App\Models\Department;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\ApiCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -17,169 +18,239 @@ use Str;
 
 class AuthController extends Controller
 {
+    public function __construct(private ApiCacheService $apiCache) {}
     public function Signup(CreateStudentRequest $request)
     {
-        logger($request);
         $validated = $request->validated();
 
-        $name = ucwords($validated['name']);
-        $nameParts = explode(" ", $name);
-        $password = $nameParts[0] . rand(1000, 9999);
-        $fakeUserName = str_replace('/', '', $validated['student_id']);
-        $department = Department::where('department', $validated['department'])->first();
-        logger($department->department);
-        logger($department->college);
-        logger($department->id);
+        $name = ucwords($validated["name"]);
+        $nameParts = preg_split("/\s+/", trim($name));
+        $password = ($nameParts[0] ?? "Student") . rand(1000, 9999);
+        $fakeUserName = str_replace("/", "", $validated["student_id"]);
+        $department = Department::where(
+            "department",
+            $validated["department"],
+        )->first();
 
         if (!$department) {
-            return response()->json([
-                'error' => 'Department not found: ' . $validated['department']
-            ], 422);
+            return response()->json(
+                [
+                    "error" =>
+                        "Department not found: " . $validated["department"],
+                ],
+                422,
+            );
         }
+
         $user = User::create([
-            'name' => $name,
-            'username' => $fakeUserName,
-            'password' => Hash::make($password),
-            'role' => 'student'
+            "name" => $name,
+            "username" => $fakeUserName,
+            "password" => Hash::make($password),
+            "role" => "student",
         ]);
 
-        logger($user);
         Student::create([
-            'user_id' => $user->id,
-            'student_id' => $validated['student_id'],
-            'department_id' => $department->id,
-            'year' => $validated['year']
+            "user_id" => $user->id,
+            "student_id" => $validated["student_id"],
+            "department_id" => $department->id,
+            "year" => $validated["year"],
         ]);
-        logger($user->student);
+
+        $this->apiCache->bump([
+            "admin_dashboard",
+            "admin_users",
+            "admin_departments",
+            "users",
+            "students",
+            "departments",
+            "clearance_requests",
+        ]);
 
         return response()->json([
-            'message' => 'Student ' . $user->name . ' created successfully',
-            'username' => $fakeUserName,
-            'password' => $password
+            "message" => "Student " . $user->name . " created successfully",
+            "username" => $fakeUserName,
+            "password" => $password,
         ]);
     }
     public function changePassword(Request $request)
     {
         $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed'
+            "current_password" => "required|string",
+            "new_password" => "required|string|min:8|confirmed",
         ]);
         $user = auth()->user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['message' => 'Current password is incorrect'], 422);
+            return response()->json(
+                ["message" => "Current password is incorrect"],
+                422,
+            );
         }
 
         $user->password = Hash::make($request->new_password);
         $user->save();
 
-        return response()->json(['message' => 'Password changed successfully']);
+        $this->apiCache->bump([
+            "admin_dashboard",
+            "admin_users",
+            "users",
+            "user:" . $user->id,
+        ]);
+
+        return response()->json(["message" => "Password changed successfully"]);
     }
 
     public function login(LoginRequest $request)
     {
         $request->validated();
 
-        $credentals = $request->only('login', 'password');
-        $field = filter_var($credentals['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        $user = User::where([
-            $field => $credentals['login']
-        ], $request->username)->first();
+        $credentals = $request->only("login", "password");
+        $field = filter_var($credentals["login"], FILTER_VALIDATE_EMAIL)
+            ? "email"
+            : "username";
+        $user = User::where(
+            [
+                $field => $credentals["login"],
+            ],
+            $request->username,
+        )->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Bad Credentials'
-            ], 401);
+            return response()->json(
+                [
+                    "message" => "Bad Credentials",
+                ],
+                401,
+            );
         }
 
         $token = $user->createToken($user->name)->plainTextToken;
         return [
-            'user' => $user->load('student'),
-            'token' => $token
+            "user" => $user->load("student"),
+            "token" => $token,
         ];
     }
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(["message" => "Logged out successfully"]);
     }
     public function me(Request $request)
     {
-        return response()->json(['user' => $request->user()]);
+        return response()->json(["user" => $request->user()]);
     }
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt|max:10240',
+            "file" => "required|mimes:csv,txt|max:10240",
         ]);
 
-        $file = $request->file('file');
+        $uploadedFile = $request->file("file");
 
-        if (!file_exists(storage_path('app/uploads'))) {
-            mkdir(storage_path('app/uploads'), 0777, true);
+        if (!file_exists(storage_path("app/uploads"))) {
+            mkdir(storage_path("app/uploads"), 0777, true);
         }
 
-        $file->move(storage_path('app/uploads'), 'students.csv');
-        $fullPath = storage_path('app/uploads/students.csv');
+        $uploadedFile->move(storage_path("app/uploads"), "students.csv");
+        $fullPath = storage_path("app/uploads/students.csv");
 
         if (!file_exists($fullPath)) {
-            Log::error('File not found: ' . $fullPath);
-            return response()->json(['error' => 'File not found'], 500);
+            Log::error("File not found: " . $fullPath);
+            return response()->json(["error" => "File not found"], 500);
         }
 
-        $file = fopen($fullPath, 'r');
+        $file = fopen($fullPath, "r");
         if (!$file) {
-            return response()->json(['error' => 'Failed to open the file'], 500);
+            return response()->json(
+                ["error" => "Failed to open the file"],
+                500,
+            );
         }
 
         $students = [];
-        $stuData = []; // Change to an array to store all students
         $firstRow = true;
+        $departments = Department::select("id", "department")
+            ->get()
+            ->keyBy("department");
 
         while (($row = fgetcsv($file)) !== false) {
             if ($firstRow) {
                 $firstRow = false;
                 continue;
             }
-            $name = ucwords($row[1]);
-            $nameParts = explode(' ', $name);
-            $password = $nameParts[0] . rand(1000, 9999);
-            $fakeUserName = str_replace('/', '', $row[0]);
+
+            if (count($row) < 4) {
+                continue;
+            }
+
+            $studentId = trim($row[0]);
+            $name = ucwords(trim($row[1]));
+            $departmentName = trim($row[2]);
+            $year = trim($row[3]);
+
+            if (
+                $studentId === "" ||
+                $name === "" ||
+                $departmentName === "" ||
+                $year === ""
+            ) {
+                continue;
+            }
+
+            $department = $departments->get($departmentName);
+
+            if (!$department) {
+                continue;
+            }
+
+            $nameParts = preg_split("/\s+/", $name);
+            $password = ($nameParts[0] ?? "Student") . rand(1000, 9999);
+            $fakeUserName = str_replace("/", "", $studentId);
 
             $user = User::create([
-                'name' => $name,
-                'username' => $fakeUserName,
-                'password' => Hash::make($password),
-                'role' => 'student'
+                "name" => $name,
+                "username" => $fakeUserName,
+                "password" => Hash::make($password),
+                "role" => "student",
             ]);
 
             Student::create([
-                'user_id' => $user->id,
-                'student_id' => $row[0],
-                'department' => $row[2],
-                'year' => $row[3]
+                "user_id" => $user->id,
+                "student_id" => $studentId,
+                "department_id" => $department->id,
+                "year" => $year,
             ]);
 
             $students[] = [
-                'student_id' => $row[0],
-                'name' => $row[1],
-                'username' => $fakeUserName,
-                'department' => $row[2],
-                'password' => $password,
-                'year' => $row[3],
-                'created_at' => now(),
-                'updated_at' => now(),
+                "student_id" => $studentId,
+                "name" => $name,
+                "username" => $fakeUserName,
+                "department" => $departmentName,
+                "password" => $password,
+                "year" => $year,
+                "created_at" => now(),
+                "updated_at" => now(),
             ];
-            return response()->json([
-                'message' => 'Student Account is Created For ' . $students['name'],
-                'students' => $students
-            ]);
         }
 
         fclose($file);
 
+        if (!empty($students)) {
+            $this->apiCache->bump([
+                "admin_dashboard",
+                "admin_users",
+                "admin_departments",
+                "users",
+                "students",
+                "departments",
+                "clearance_requests",
+            ]);
+        }
+
         return response()->json([
-            'message' => 'Students Accounts is Created successfully',
-            'students' => $students,
+            "message" => !empty($students)
+                ? "Students Accounts is Created successfully"
+                : "No valid students were imported",
+            "students" => $students,
         ]);
     }
 }

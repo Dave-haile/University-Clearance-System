@@ -8,8 +8,6 @@ import { Department } from '../../../types/department';
 export const fetchUserDetail = async (userId: string): Promise<{ user: User; clearances: ClearanceRequest[] }> => {
   try {
     const response = await axiosClient.get(`/admin/users/${userId}`);
-    notifySuccess("User details fetched successfully!");
-    console.log(response.data)
     return {
       user: response.data.user,
       clearances: response.data.clearances
@@ -33,7 +31,6 @@ export const updateUser = async (userId: string, userData: Partial<User>): Promi
     // return response.data;
 
     // For development, just return the data that would be sent
-    console.log("Update user data:", userData);
     return { ...userData, id: parseInt(userId) } as User;
   } catch (error) {
     console.error("Error updating user:", error);

@@ -1,161 +1,167 @@
-import { useState, useEffect } from "react";
-import { Menu, X, GraduationCap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { NAV_LINKS, ROLE_CONFIG } from './components/constants';
+import { UserRole } from './components/types';
 import { useAuth } from "@/context/authContext";
-import { Button } from "@/components/ui/button";
+import { GraduationCap, Menu, X, Sun, Moon, LogOut } from 'lucide-react';
+
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { logout, user } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+  const toggleTheme = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-    setIsMobileMenuOpen(false);
   };
 
-  const getRoleBasedButton = () => {
-    if (!user) {
-      return <Button onClick={() => navigate("/login")}>Login</Button>;
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
+  const authCta = (isMobile = false) => {
+    if (!user || !user.role) {
+      return (
+        <button
+          onClick={handleLoginClick}
+          className={`bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 dark:shadow-blue-900/20 hover:bg-blue-800 hover:shadow-xl transition-all ${isMobile ? 'w-full' : ''}`}
+        >
+          Login
+        </button>
+      );
     }
 
-    const roleConfig = {
-      admin: { label: "Go to Admin Dashboard", path: "/admin/dashboard" },
-      student: { label: "Go to Student Dashboard", path: "/student/dashboard" },
-      department_head: {
-        label: "Go to Department Panel",
-        path: "/department/dashboard",
-      },
-      library_staff: {
-        label: "Go to Library Panel",
-        path: "/library/dashboard",
-      },
-      registrar: {
-        label: "Go to Registrar Panel",
-        path: "/registrar/dashboard",
-      },
-      proctor: {
-        label: "Go to Dorm Proctor Panel",
-        path: "/proctor/dashboard",
-      },
-      cafeteria: {
-        label: "Go to Cafeteria Panel",
-        path: "/cafeteria/dashboard",
-      },
-    };
-
-    const config = roleConfig[user.role as keyof typeof roleConfig];
-
+    const config = ROLE_CONFIG[user.role as UserRole];
     return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground hidden md:inline">
-          Welcome, {user.role.replace("_", " ")}
-        </span>
-        {/* <Button onClick={() => navigate(config?.path || "/")}>
-          {config?.label || "Go to Dashboard"}
-        </Button> */}
-        <Button
-          onClick={() => {
-            if (user?.role === "student")
-              return navigate("/student/submit-clearance");
-            if (user?.role === "department_head")
-              return navigate("/department_head/dashboard");
-            if (user?.role === "admin") return navigate("/admin/Dashbord");
-          }}
+      <div className={`flex items-center gap-3 ${isMobile ? 'flex-col' : ''}`}>
+        <button
+          onClick={() => navigate(config.path)}
+          className={`${config.color} text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all ${isMobile ? 'w-full' : ''}`}
         >
-          {config?.label || "Go to Dashboard"}
-        </Button>
-        <Button variant="outline" onClick={logout}>
-          Logout
-        </Button>
+          {config.label}
+        </button>
+        <button
+          onClick={logout}
+          className={`p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl transition-all ${isMobile ? 'flex items-center gap-2' : ''}`}
+          title="Logout"
+        >
+          <LogOut size={20} />
+          {isMobile && <span className="font-bold">Logout</span>}
+        </button>
       </div>
     );
   };
 
-  const navItems = [
-    { label: "Home", id: "hero" },
-    { label: "Features", id: "features" },
-    { label: "Process", id: "process" },
-    { label: "How It Works", id: "how-it-works" },
-  ];
-
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-sm shadow-md"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-[rgba(255,255,255,0.7)] backdrop-blur-md py-3 shadow-md dark:bg-[rgba(15,23,42,0.7)]' : 'bg-transparent py-6'
+        }`}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">
-              ClearanceHub
-            </span>
+      <div className="container mx-auto px-4 md:px-8 flex items-center justify-between">
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => navigate('/')}
+        >
+          <div className="bg-blue-700 p-2.5 rounded-xl text-white group-hover:scale-110 transition-transform shadow-lg shadow-blue-700/20">
+            <GraduationCap size={24} />
           </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="text-foreground hover:text-primary transition-colors duration-200 relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-              </button>
-            ))}
-          </nav>
-
-          {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex">{getRoleBasedButton()}</div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          <div className="flex flex-col leading-none">
+            <span className="text-xl font-extrabold tracking-tight text-slate-800 dark:text-white">
+              Injibara <span className="text-blue-700 dark:text-blue-400">IU</span>
+            </span>
+            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Clearance</span>
+          </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-sm shadow-lg border-b">
-            <nav className="flex flex-col space-y-4 p-4">
-              {navItems.map((item) => (
+        <nav className="hidden lg:flex items-center gap-8">
+          <ul className="flex gap-8">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
                 <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className="text-left text-foreground hover:text-primary transition-colors duration-200"
+                  onClick={() => scrollToSection(link.href)}
+                  className="text-slate-600 dark:text-slate-300 hover:text-blue-700 dark:hover:text-blue-400 font-bold transition-colors"
                 >
-                  {item.label}
+                  {link.name}
                 </button>
-              ))}
-              <div className="pt-4 border-t">{getRoleBasedButton()}</div>
-            </nav>
-          </div>
-        )}
+              </li>
+            ))}
+          </ul>
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            aria-label="Toggle theme"
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+
+          {authCta()}
+        </nav>
+
+        <div className="flex items-center gap-2 lg:hidden">
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+          >
+            {isDarkMode ? <Sun size={24} /> : <Moon size={24} />}
+          </button>
+          <button
+            className="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </div>
+
+      <div
+        className={`lg:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 shadow-xl transition-all duration-300 overflow-hidden ${mobileMenuOpen ? 'max-h-[500px] border-t dark:border-slate-800' : 'max-h-0'
+          }`}
+      >
+        <ul className="flex flex-col p-6 gap-4">
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <button
+                onClick={() => scrollToSection(link.href)}
+                className="w-full text-left text-lg text-slate-700 dark:text-slate-200 font-bold py-3 border-b border-slate-50 dark:border-slate-800"
+              >
+                {link.name}
+              </button>
+            </li>
+          ))}
+          <li className="pt-4">
+            {authCta(true)}
+          </li>
+        </ul>
       </div>
     </header>
   );

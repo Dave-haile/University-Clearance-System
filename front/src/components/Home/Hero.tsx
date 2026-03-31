@@ -31,7 +31,7 @@ export default function Hero() {
         </div>
         <div className="md:w-1/2">
           <img
-            src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80"
+            src="/hero1.png"
             alt="Students using digital system"
             className="rounded-lg shadow-2xl"
           />

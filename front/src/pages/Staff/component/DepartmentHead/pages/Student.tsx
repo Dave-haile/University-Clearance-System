@@ -1,5 +1,5 @@
 import { MainLayout } from "../../layout/MainLayout";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Pagination from "@/pages/Admin/components/UserManagement/Pagination";
 import {
   User as Users,
@@ -7,28 +7,27 @@ import {
   SortField,
   SortDirection,
 } from "@/types/user";
-import { UserPlus } from "lucide-react";
+
 import EditUserDialog from "@/pages/Admin/components/UserManagement/EditUserDialog";
 import DeleteUserDialog from "@/pages/Admin/components/UserManagement/DeleteUserDialog";
 import { showError } from "@/hooks/toast";
 import UserTable from "@/pages/Admin/components/UserManagement/UserTable";
 import axiosClient from "@/services/axiosBackend";
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/queryKeys";
 // import StudentRegistration from "@/components/Staff/components/StudentAccountCreation";
 // import CreateUserDialog from "../DashboardComponents/CreateUserDialog";
 
 const ITEMS_PER_PAGE = 15;
 
 const Student: React.FC = () => {
-  const [users, setUsers] = useState<Users[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<Users[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [roleFilter, setRoleFilter] = useState<UserRole>("all");
+  const [roleFilter] = useState<UserRole>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Users | null>(null);
@@ -53,27 +52,25 @@ const Student: React.FC = () => {
     setSelectedUser(null);
   };
 
-  const loadUsers = async () => {
-    setLoading(true);
-    try {
-      const data = await axiosClient.get("/staff/students");
-      console.log(data.data);
-      setUsers(data.data);
-      setError(null);
-    } catch (err) {
-      setError("Failed to load users. Please try again later.");
-      console.log("Error fetching users:", err);
-      showError("Failed to load users. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  const loadUsers = async (): Promise<Users[]> => {
+    const data = await axiosClient.get("/staff/students");
+    console.log(data.data);
+    return data.data;
   };
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
+  const {
+    data: users = [],
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.staff.students,
+    queryFn: loadUsers,
+  });
 
-  useEffect(() => {
+  const loading = isLoading || isFetching;
+
+  const filteredUsers = useMemo(() => {
     let result = [...users];
     if (roleFilter !== "all") {
       result = result.filter((user) => user.role === roleFilter);
@@ -85,7 +82,7 @@ const Student: React.FC = () => {
           user.name.toLowerCase().includes(searchTermLower) ||
           (user.username &&
             user.username.toLowerCase().includes(searchTermLower)) ||
-          (user.email && user.email.toLowerCase().includes(searchTermLower))
+          (user.email && user.email.toLowerCase().includes(searchTermLower)),
       );
     }
 
@@ -102,8 +99,7 @@ const Student: React.FC = () => {
       return 0;
     });
 
-    setFilteredUsers(result);
-    setCurrentPage(1);
+    return result;
   }, [users, roleFilter, searchTerm, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
@@ -115,9 +111,10 @@ const Student: React.FC = () => {
     }
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     try {
-      loadUsers();
+      setError(null);
+      await refetch();
     } catch (error) {
       showError(`Refresh Unsuccessful ${error}`);
     }
@@ -127,14 +124,6 @@ const Student: React.FC = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentUsers = filteredUsers.slice(startIndex, endIndex);
-
-  const handleOpenCreateDialog = () => {
-    setIsCreateDialogOpen(true);
-  };
-
-  const handleCloseCreateDialog = () => {
-    setIsCreateDialogOpen(false);
-  };
 
   return (
     <MainLayout>

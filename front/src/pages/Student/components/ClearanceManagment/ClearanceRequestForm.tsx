@@ -43,6 +43,8 @@ import { cn } from "@/pages/Admin/lib/utils";
 import axiosClient from "@/services/axiosBackend";
 import axios from "axios";
 import { User } from "@/types";
+import { queryClient } from "@/lib/queryClient";
+import { queryKeys } from "@/lib/queryKeys";
 
 interface ClearanceRequestFormProps {
   studentData: User;
@@ -82,7 +84,7 @@ const formSchema = z
     {
       message: "Please provide details for other reason",
       path: ["other_reason"],
-    }
+    },
   );
 
 type FormValues = z.infer<typeof formSchema>;
@@ -122,6 +124,19 @@ export function ClearanceRequestForm({
       };
       const response = await axiosClient.post("/clearance-request", formData);
       console.log(response.data);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.student.dashboard,
+        }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.student.allData }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.student.clearanceHistory,
+        }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.staff.dashboard }),
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.staff.clearanceRequests,
+        }),
+      ]);
       toast.success("Your clearance request has been submitted successfully.");
       form.reset();
     } catch (error: unknown) {
@@ -130,7 +145,7 @@ export function ClearanceRequestForm({
         if (error.status === 400) {
           toast.error(
             error.response?.data?.message ||
-              "Failed to submit clearance request. Please try again."
+              "Failed to submit clearance request. Please try again.",
           );
         } else {
           toast.error("Failed to submit clearance request. Please try again.");
@@ -295,7 +310,7 @@ export function ClearanceRequestForm({
                             variant={"outline"}
                             className={cn(
                               "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
