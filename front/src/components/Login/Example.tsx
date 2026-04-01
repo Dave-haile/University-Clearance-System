@@ -199,23 +199,28 @@ const demoCredentials = [
   { role: "Admin", email: "admin@university.com", desc: "Full system control" },
   {
     role: "Dept Head",
-    email: "head@university.edu",
+    email: "staff@university.com",
     desc: "Departmental oversight",
   },
   {
     role: "Registrar",
-    email: "registrar@university.edu",
+    email: "daniel.lula@example.org",
     desc: "Academic records",
   },
   {
     role: "Student",
-    email: "student@university.edu",
+    email: "INUSR861825",
     desc: "Clearance tracking",
   },
   {
     role: "Library",
-    email: "library@university.edu",
+    email: "ernest.treutel@example.net",
     desc: "Resource management",
+  },
+  {
+    role: "Proctor",
+    email: "pstanton@example.com",
+    desc: "Bedroom supervision",
   },
 ];
 
