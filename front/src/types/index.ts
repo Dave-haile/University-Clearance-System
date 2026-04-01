@@ -106,7 +106,17 @@ export interface Department {
     student_id: string;
     sex: string;
     status: "pending" | "approved" | "rejected";
-    approvals: string;
+    approvals:
+      | Record<
+          string,
+          {
+            status: "pending" | "approved" | "rejected";
+            remarks: string | null;
+            timestamp: string | null;
+            approved_by: number | null;
+          }
+        >
+      | null;
     year: string;
     semester: string;
     section: string;
@@ -126,6 +136,10 @@ export interface Department {
     created_at: string;
     updated_at: string;
     department: Department;
+    student: {
+      user: User;
+      department?: Department | null;
+    };
   }
   
   export interface Student {

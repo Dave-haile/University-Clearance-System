@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -63,7 +63,7 @@ const clearanceSchema = z
 type FormValues = z.infer<typeof clearanceSchema>;
 
 const StudentClearanceRequest: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { addToast } = useToast();
   const [isSuccess, setIsSuccess] = useState(false);
@@ -98,9 +98,40 @@ const StudentClearanceRequest: React.FC = () => {
     isLoading: fetchLoading,
     error,
   } = useQuery<User>({
-    queryKey: queryKeys.student.dashboard,
+    queryKey: queryKeys.student.allData,
     queryFn: fetchStudentData,
+    enabled: !authLoading,
   });
+
+  useEffect(() => {
+    if (!studentData?.student) return;
+
+    setValue("year", studentData.student.year || "4th Year");
+  }, [studentData, setValue]);
+
+  if (authLoading || fetchLoading) {
+    return (
+      <>
+        <Card className="bg-slate-950">
+          <CardHeader className="bg-slate-950">
+            <CardTitle>
+              <Skeleton className=" bg-slate-950 h-8 w-60" />
+            </CardTitle>
+            <CardDescription>
+              <Skeleton className="h-5 w-full max-w-md bg-slate-950" />
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="bg-slate-950 h-16 w-full" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   if (error) {
     return (
@@ -115,29 +146,6 @@ const StudentClearanceRequest: React.FC = () => {
           </AlertDescription>
         </Alert>
       </div>
-    );
-  }
-  if (fetchLoading) {
-    return (
-      <>
-        <Card className="bg-slate-950">
-          <CardHeader className="bg-slate-950">
-            <CardTitle>
-              <Skeleton className="h-8 w-60" />
-            </CardTitle>
-            <CardDescription>
-              <Skeleton className="h-5 w-full max-w-md" />
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </>
     );
   }
 
@@ -192,41 +200,6 @@ const StudentClearanceRequest: React.FC = () => {
       setSubmitting(false);
     }
   };
-
-  if (fetchLoading) {
-    return (
-      <div className="max-w-[1400px] mx-auto space-y-10 pb-20 animate-fade-in">
-        <div className="bg-white dark:bg-slate-900 rounded-[48px] border border-slate-200 dark:border-slate-800 shadow-sm p-6 md:p-12">
-          <div className="space-y-4">
-            {[...Array(10)].map((_, i) => (
-              <div
-                key={i}
-                className="h-12 w-full bg-slate-100 dark:bg-slate-800 rounded-2xl"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-[1400px] mx-auto space-y-10 pb-20 animate-fade-in">
-        <div className="bg-white dark:bg-slate-900 rounded-[56px] border border-slate-200 dark:border-slate-800 shadow-sm p-10">
-          <div className="flex items-center gap-2 text-rose-600">
-            <AlertCircle className="w-5 h-5" />
-            <p className="text-xs font-black uppercase tracking-widest">
-              Failed to load student data
-            </p>
-          </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-4">
-            Please refresh the page.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (!studentData?.student) {
     return (

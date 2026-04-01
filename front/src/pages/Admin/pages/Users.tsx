@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useDeferredValue, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   UserPlus,
@@ -11,16 +11,25 @@ import {
   ArrowUpDown,
   ChevronUp,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { User } from "@/types";
 import CreateUserDialog from "../components/UserManagement/CreateUserDialog";
 import axiosClient from "@/services/axiosBackend";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/lib/queryKeys";
 
 type SortField = "name" | "email" | "created_at";
 type SortDirection = "asc" | "desc";
+
+type PaginatedUsersResponse = {
+  data: User[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
 
 const Users: React.FC = () => {
   const [loadingToastShown, setLoadingToastShown] = useState(false);
@@ -34,32 +43,50 @@ const Users: React.FC = () => {
   const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const navigate = useNavigate();
+  const deferredSearchTerm = useDeferredValue(searchTerm.trim());
 
-  const fetchUsers = async (): Promise<User[]> => {
-    try {
-      const data = await axiosClient.get("/admin/users");
-      console.log(data.data);
-      return data.data;
-    } catch (err) {
-      console.log("Error fetching users:", err);
-      throw err;
-    }
+  const fetchUsers = async (): Promise<PaginatedUsersResponse> => {
+    const response = await axiosClient.get("/admin/users", {
+      params: {
+        search: deferredSearchTerm || undefined,
+        role: roleFilter,
+        page: currentPage,
+        limit: itemsPerPage,
+        sort_by: sortField,
+        sort_dir: sortDirection,
+      },
+    });
+
+    return response.data;
   };
 
   const {
-    data: users = [],
+    data,
     isLoading,
     isFetching,
     error: queryError,
     refetch,
   } = useQuery({
-    queryKey: queryKeys.admin.usersBase,
+    queryKey: [
+      "admin",
+      "users",
+      deferredSearchTerm,
+      roleFilter,
+      currentPage,
+      itemsPerPage,
+      sortField,
+      sortDirection,
+    ],
     queryFn: fetchUsers,
   });
 
+  const users = data?.data ?? [];
+  const totalPages = data?.last_page ?? 1;
+  const totalUsers = data?.total ?? 0;
   const loading = isLoading || isFetching;
 
   const handleSort = (field: SortField) => {
+    setCurrentPage(1);
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -68,56 +95,23 @@ const Users: React.FC = () => {
     }
   };
 
-  const filteredAndSortedUsers = useMemo(
-    () =>
-      users
-        .filter((user) => {
-          const searchStr = searchTerm.toLowerCase();
-          const matchesSearch =
-            user.name.toLowerCase().includes(searchStr) ||
-            (user.email && user.email.toLowerCase().includes(searchStr)) ||
-            (user.username &&
-              user.username.toLowerCase().includes(searchStr)) ||
-            (user.student?.student_id &&
-              user.student.student_id.toLowerCase().includes(searchStr));
-          const matchesRole = roleFilter === "all" || user.role === roleFilter;
-          return matchesSearch && matchesRole;
-        })
-        .sort((a, b) => {
-          let comparison = 0;
-          if (sortField === "name") {
-            comparison = a.name.localeCompare(b.name);
-          } else if (sortField === "email") {
-            const emailA = a.email || a.username || "";
-            const emailB = b.email || b.username || "";
-            comparison = emailA.localeCompare(emailB);
-          } else if (sortField === "created_at") {
-            comparison =
-              new Date(a.created_at as string).getTime() -
-              new Date(b.created_at as string).getTime();
-          }
-          return sortDirection === "asc" ? comparison : -comparison;
-        }),
-    [users, searchTerm, roleFilter, sortField, sortDirection],
-  );
-
-  const totalPages = Math.ceil(filteredAndSortedUsers.length / itemsPerPage);
-  const currentUsers = filteredAndSortedUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field)
+    if (sortField !== field) {
       return (
         <ArrowUpDown className="w-3.5 h-3.5 ml-1.5 text-slate-400 opacity-50" />
       );
+    }
+
     return sortDirection === "asc" ? (
       <ChevronUp className="w-3.5 h-3.5 ml-1.5 text-indigo-500" />
     ) : (
       <ChevronDown className="w-3.5 h-3.5 ml-1.5 text-indigo-500" />
     );
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [deferredSearchTerm, roleFilter, itemsPerPage]);
 
   useEffect(() => {
     if (queryError && !loadingToastShown) {
@@ -133,6 +127,7 @@ const Users: React.FC = () => {
   if (error !== null) {
     toast.error(error);
   }
+
   return (
     <div className="space-y-5 animate-fade-in">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -154,7 +149,7 @@ const Users: React.FC = () => {
             />
           </button>
           <button
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={() => navigate("/admin/users/new-user")}
             className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold shadow-lg shadow-indigo-100 dark:shadow-indigo-900/20 hover:bg-indigo-700 transition-all active:scale-95"
           >
             <UserPlus className="w-3.5 h-3.5" />
@@ -171,10 +166,7 @@ const Users: React.FC = () => {
             placeholder="Search by name, email or ID..."
             className="w-full pl-9 pr-3.5 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-900 dark:text-slate-100"
             value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-1.5">
@@ -183,10 +175,7 @@ const Users: React.FC = () => {
             <select
               className="pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none text-slate-900 dark:text-slate-100 min-w-[148px]"
               value={roleFilter}
-              onChange={(e) => {
-                setRoleFilter(e.target.value);
-                setCurrentPage(1);
-              }}
+              onChange={(e) => setRoleFilter(e.target.value)}
             >
               <option value="all">All Roles</option>
               <option value="student">Students</option>
@@ -239,107 +228,108 @@ const Users: React.FC = () => {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading
                 ? Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-5 py-3.5" colSpan={4}>
-                      <div className="h-9 bg-slate-100 dark:bg-slate-800 rounded-lg w-full"></div>
-                    </td>
-                  </tr>
-                ))
-                : currentUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    onClick={() => navigate(`/admin/users/${user.id}`)}
-                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
-                  >
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-[11px] shadow-sm overflow-hidden">
-                          {user.profile_image ? (
-                            <img
-                              src={user.profile_image}
-                              alt=""
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            user.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                          )}
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-5 py-3.5" colSpan={4}>
+                        <div className="h-9 bg-slate-100 dark:bg-slate-800 rounded-lg w-full"></div>
+                      </td>
+                    </tr>
+                  ))
+                : users.map((user) => (
+                    <tr
+                      key={user.id}
+                      onClick={() => navigate(`/admin/users/${user.id}`)}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group cursor-pointer"
+                    >
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-[11px] shadow-sm overflow-hidden">
+                            {user.profile_image ? (
+                              <img
+                                src={user.profile_image}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              user.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold text-slate-900 dark:text-slate-100 leading-none">
+                              {user.name}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                              #{user.id}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[13px] font-bold text-slate-900 dark:text-slate-100 leading-none">
-                            {user.name}
-                          </p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                            #{user.id}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-[0.14em] ${user.role === "student"
-                              ? "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
-                              : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400"
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-[0.14em] ${
+                                user.role === "student"
+                                  ? "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+                                  : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400"
                               }`}
-                          >
-                            {user.role.replace("_", " ")}
-                          </span>
-                          {user.student && (
-                            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-[0.14em] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                              {user.student.year}
+                            >
+                              {user.role.replace("_", " ")}
                             </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate max-w-[180px]">
-                          {user.student?.department?.department ||
-                            user.staff?.department?.department ||
-                            "System Admin"}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                          {user.email ? (
-                            <>
-                              <Mail className="w-3 h-3" />
-                              <span className="text-[11px] font-mono">
-                                {user.email}
+                            {user.student && (
+                              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-[0.14em] bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                {user.student.year}
                               </span>
-                            </>
-                          ) : (
-                            <>
-                              <UserIcon className="w-3 h-3" />
-                              <span className="text-[11px] font-mono">
-                                {user.username}
-                              </span>
-                            </>
-                          )}
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate max-w-[180px]">
+                            {user.student?.department?.department ||
+                              user.staff?.department?.department ||
+                              "System Admin"}
+                          </p>
                         </div>
-                        <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">
-                          ID: {user.student?.student_id || "N/A"}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex flex-col items-end gap-1">
-                        <p className="text-[11px] font-bold text-slate-900 dark:text-slate-100">
-                          {user.created_at
-                            ? new Date(user.created_at).toLocaleDateString()
-                            : "N/A"}
-                        </p>
-                        <button className="p-1 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-md opacity-0 group-hover:opacity-100 transition-all">
-                          <ExternalLink className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              {!loading && filteredAndSortedUsers.length === 0 && (
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                            {user.email ? (
+                              <>
+                                <Mail className="w-3 h-3" />
+                                <span className="text-[11px] font-mono">
+                                  {user.email}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <UserIcon className="w-3 h-3" />
+                                <span className="text-[11px] font-mono">
+                                  {user.username}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">
+                            ID: {user.student?.student_id || "N/A"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="flex flex-col items-end gap-1">
+                          <p className="text-[11px] font-bold text-slate-900 dark:text-slate-100">
+                            {user.created_at
+                              ? new Date(user.created_at).toLocaleDateString()
+                              : "N/A"}
+                          </p>
+                          <button className="p-1 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-md opacity-0 group-hover:opacity-100 transition-all">
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              {!loading && users.length === 0 && (
                 <tr>
                   <td colSpan={4} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-2">
@@ -357,27 +347,58 @@ const Users: React.FC = () => {
 
         <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-            Showing <span className="text-slate-900 dark:text-slate-100">{currentPage}</span> out of <span className="text-slate-900 dark:text-slate-100">{totalPages}</span>
+            Page{" "}
+            <span className="text-slate-900 dark:text-slate-100">
+              {currentPage}
+            </span>{" "}
+            of{" "}
+            <span className="text-slate-900 dark:text-slate-100">
+              {totalPages}
+            </span>{" "}
+            •{" "}
+            <span className="text-slate-900 dark:text-slate-100">
+              {totalUsers}
+            </span>{" "}
+            users
           </p>
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-              {[20, 100, 500].map(size => (
+              {[20, 100, 500].map((size) => (
                 <button
                   key={size}
-                  onClick={() => {
-                    setItemsPerPage(size);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${itemsPerPage === size ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                  onClick={() => setItemsPerPage(size)}
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${
+                    itemsPerPage === size
+                      ? "bg-indigo-600 text-white shadow-md"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
                 >
                   {size}
                 </button>
               ))}
             </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                disabled={currentPage <= 1 || loading}
+                className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(page + 1, totalPages || 1))
+                }
+                disabled={currentPage >= totalPages || loading}
+                className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
-
       </div>
 
       <CreateUserDialog
@@ -385,7 +406,7 @@ const Users: React.FC = () => {
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={() => {
           setIsCreateModalOpen(false);
-          fetchUsers();
+          refetch();
         }}
       />
     </div>
