@@ -34,7 +34,7 @@ const demoCredentials = [
   },
   {
     role: "Student",
-    email: "INUSR861825",
+    email: "INUSR022113",
     desc: "Clearance tracking",
   },
   {
