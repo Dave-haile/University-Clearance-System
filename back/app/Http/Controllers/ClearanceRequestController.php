@@ -8,7 +8,6 @@ use App\Models\Student;
 use App\Services\ApiCacheService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class ClearanceRequestController extends Controller
 {
@@ -101,13 +100,6 @@ class ClearanceRequestController extends Controller
             );
         }
 
-        $approvals = [
-            "department_head" => null,
-            "library" => null,
-            "cafeteria" => null,
-            "proctor" => null,
-            "registrar" => null,
-        ];
         $clearanceRequest = ClearanceRequest::create([
             "student_id" => $student_id,
             "sex" => $validatedData["sex"],
@@ -122,6 +114,8 @@ class ClearanceRequestController extends Controller
             "reason_for_clearance" => $validatedData["reason_for_clearance"],
             "cafe_status" => $validatedData["cafe_status"],
             "dorm_status" => $validatedData["dorm_status"],
+            "current_step" => "department_head",
+            "approvals" => $this->defaultApprovals(),
             "archived" => false,
         ]);
 
@@ -153,60 +147,32 @@ class ClearanceRequestController extends Controller
 
     public function index(Request $request)
     {
-        $staffRole = $request->query("staff_role"); // Get the role from the query param
+        $user = Auth::user();
+        if (!$user || !$user->staff) {
+            return response()->json(["message" => "Unauthorized"], 403);
+        }
 
-        $roleToStep = [
-            "department_head" => "department_head",
-            "library" => "library",
-            "cafeteria" => "cafeteria",
-            "proctor" => "proctor",
-            "registrar" => "registrar",
-        ];
-
-        if (!isset($roleToStep[$staffRole])) {
+        $staffRole = $this->normalizeStaffRole($user->role);
+        $requestedRole = $this->normalizeStaffRole($request->query("staff_role"));
+        if (!$staffRole || ($requestedRole && $requestedRole !== $staffRole)) {
             return response()->json(["message" => "Invalid staff role"], 400);
         }
 
-        $cacheData = $this->apiCache->rememberRequest(
-            [
-                "clearance_requests",
-                "staff_queue",
-                "students",
-                "departments",
-                "users",
-            ],
-            $request,
-            180,
-            function () use ($roleToStep, $staffRole) {
-                $clearanceRequests = ClearanceRequest::where(
-                    "current_step",
-                    $roleToStep[$staffRole],
-                )
-                    ->where("archived", false)
-                    ->where("status", "!=", "rejected")
-                    ->with(["student", "student.user", "department"])
-                    ->orderBy("created_at", "desc")
-                    ->get();
+        $query = ClearanceRequest::with(["student.user", "student.department", "department"])
+            ->where("current_step", $staffRole)
+            ->where("archived", false)
+            ->where("status", "pending");
 
-                if ($clearanceRequests->isEmpty()) {
-                    return [
-                        "status" => 404,
-                        "body" => ["message" => "No clearance request found"],
-                    ];
-                }
+        if ($staffRole === "department_head") {
+            $query->where("department_id", $user->staff->department_id);
+        }
 
-                return [
-                    "status" => 200,
-                    "body" => [
-                        "message" => "Clearance requests fetched successfully",
-                        "data" => $clearanceRequests,
-                    ],
-                ];
-            },
-            "clearance.index",
-        );
+        $clearanceRequests = $query->orderByDesc("created_at")->get();
 
-        return response()->json($cacheData["body"], $cacheData["status"]);
+        return response()->json([
+            "message" => "Clearance requests fetched successfully",
+            "data" => $clearanceRequests,
+        ]);
     }
 
     // public function approveClearance(Request $request, $id)
@@ -258,30 +224,58 @@ class ClearanceRequestController extends Controller
 
     public function approveClearance(Request $request, $id)
     {
+        $user = Auth::user();
+        if (!$user || !$user->staff) {
+            return response()->json(["message" => "Unauthorized"], 403);
+        }
+
         $request->validate([
-            "staff_role" => "required|string", // Example: 'department_head', 'library'
+            "staff_role" => "required|string",
             "status" => "required|in:approved,rejected",
             "remarks" => "nullable|string",
         ]);
 
-        $clearanceRequest = ClearanceRequest::findOrFail($id);
+        $staffRole = $this->normalizeStaffRole($user->role);
+        $requestedRole = $this->normalizeStaffRole($request->staff_role);
+        if (!$staffRole || $requestedRole !== $staffRole) {
+            return response()->json(["message" => "Invalid staff role"], 403);
+        }
 
-        $userId = Auth::id();
-        // Retrieve existing approvals or initialize an empty array
-        $approvals = $clearanceRequest->approvals ?? [];
+        $clearanceRequest = ClearanceRequest::with(["student.user", "student.department", "department"])->findOrFail($id);
 
-        // Update the approval status for this department
-        $approvals[$request->staff_role] = [
+        if ($clearanceRequest->archived) {
+            return response()->json(["message" => "Archived requests cannot be processed"], 422);
+        }
+
+        if ($clearanceRequest->status !== "pending") {
+            return response()->json(["message" => "This request has already been finalized"], 422);
+        }
+
+        if ($clearanceRequest->current_step !== $staffRole) {
+            return response()->json(["message" => "Not your turn to approve this request"], 403);
+        }
+
+        if (
+            $staffRole === "department_head" &&
+            (int) $clearanceRequest->department_id !== (int) $user->staff->department_id
+        ) {
+            return response()->json(["message" => "You can only review requests from your own department"], 403);
+        }
+
+        $approvals = is_array($clearanceRequest->approvals)
+            ? $clearanceRequest->approvals
+            : $this->defaultApprovals();
+
+        $approvals[$staffRole] = [
             "status" => $request->status,
             "remarks" => $request->remarks,
             "timestamp" => now(),
-            "approved_by" => $userId,
+            "approved_by" => $user->id,
         ];
 
         $clearanceRequest->approvals = $approvals;
 
-        // Set the individual boolean column dynamically
-        $booleanColumn = $request->staff_role . "_approved";
+        $booleanColumn = $staffRole . "_approved";
         if (
             in_array(
                 $booleanColumn,
@@ -295,62 +289,21 @@ class ClearanceRequestController extends Controller
                 true,
             )
         ) {
-            if ($request->status === "approved") {
-                $clearanceRequest->{$booleanColumn} = true;
-            } elseif ($request->status === "rejected") {
-                $clearanceRequest->{$booleanColumn} = false;
-            }
+            $clearanceRequest->{$booleanColumn} =
+                $request->status === "approved";
         }
 
-        // Handle next step logic only if approved
-        if ($request->status === "approved") {
-            $steps = [
-                "department_head",
-                "library",
-                "cafeteria",
-                "proctor",
-                "registrar",
-            ];
-            $currentIndex = array_search($request->staff_role, $steps);
-
-            // If not the last step, move to the next
-            if ($currentIndex !== false && $currentIndex < count($steps) - 1) {
-                $clearanceRequest->current_step = $steps[$currentIndex + 1];
-            }
-
-            // If it's the last step and approved, mark current_step as all_approved
-            if ($currentIndex === count($steps) - 1) {
-                $clearanceRequest->current_step = "all_approved";
-            }
-        }
-
-        // If rejected, we stop the flow and mark status as rejected
         if ($request->status === "rejected") {
             $clearanceRequest->status = "rejected";
         } else {
-            // Check if all approvals are done
-            $requiredDepartments = [
-                "department_head",
-                "library",
-                "cafeteria",
-                "proctor",
-                "registrar",
-            ];
-            $allApproved = true;
-            foreach ($requiredDepartments as $dept) {
-                if (
-                    !isset($approvals[$dept]) ||
-                    $approvals[$dept]["status"] !== "approved"
-                ) {
-                    $allApproved = false;
-                    break;
-                }
-            }
-
-            $clearanceRequest->status = $allApproved ? "approved" : "pending";
+            $nextStep = $this->getNextStep($staffRole);
+            $clearanceRequest->current_step = $nextStep ?? "all_approved";
+            $clearanceRequest->status = $nextStep ? "pending" : "approved";
         }
 
         $clearanceRequest->save();
+
+        $clearanceRequest->refresh();
 
         $this->apiCache->bump([
             "clearance_requests",
@@ -371,7 +324,56 @@ class ClearanceRequestController extends Controller
 
         return response()->json([
             "message" => "Clearance updated successfully",
+            "data" => $clearanceRequest,
         ]);
+    }
+
+    private function normalizeStaffRole(?string $role): ?string
+    {
+        return in_array(
+            $role,
+            ["department_head", "library", "cafeteria", "proctor", "registrar"],
+            true,
+        )
+            ? $role
+            : null;
+    }
+
+    private function getNextStep(string $currentRole): ?string
+    {
+        $steps = [
+            "department_head",
+            "library",
+            "cafeteria",
+            "proctor",
+            "registrar",
+        ];
+
+        $currentIndex = array_search($currentRole, $steps, true);
+
+        if ($currentIndex === false) {
+            return null;
+        } else {
+            return $steps[$currentIndex + 1] ?? null;
+        }
+    }
+
+    private function defaultApprovals(): array
+    {
+        $emptyApproval = [
+            "status" => "pending",
+            "remarks" => null,
+            "timestamp" => null,
+            "approved_by" => null,
+        ];
+
+        return [
+            "department_head" => $emptyApproval,
+            "library" => $emptyApproval,
+            "cafeteria" => $emptyApproval,
+            "proctor" => $emptyApproval,
+            "registrar" => $emptyApproval,
+        ];
     }
 
     public function display()

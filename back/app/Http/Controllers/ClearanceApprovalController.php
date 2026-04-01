@@ -55,7 +55,8 @@ class ClearanceApprovalController extends Controller
                 404,
             );
         }
-        $department = $staff->staff->position;
+        $department =
+            $staff->role === "library_staff" ? "library" : $staff->role;
         if ($clearanceRequest->current_step !== $department) {
             return response()->json(
                 ["message" => "Not your turn to approve this request"],

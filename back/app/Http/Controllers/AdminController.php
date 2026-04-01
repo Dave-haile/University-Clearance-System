@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\ApiCacheService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -121,11 +122,21 @@ class AdminController extends Controller
     }
     public function users(Request $request)
     {
-        $limit = (int) $request->query("limit", 20);
+        $perPage = (int) $request->query("limit", 20);
         $allowedLimits = [20, 100, 500];
+        $search = trim((string) $request->query("search", ""));
+        $role = $request->query("role", "all");
+        $page = max((int) $request->query("page", 1), 1);
+        $sortBy = $request->query("sort_by", "name");
+        $sortDirection =
+            $request->query("sort_dir", "asc") === "desc" ? "desc" : "asc";
 
-        if (!in_array($limit, $allowedLimits, true)) {
-            $limit = 20;
+        if (!in_array($perPage, $allowedLimits, true)) {
+            $perPage = 20;
+        }
+
+        if (!in_array($sortBy, ["name", "email", "created_at"], true)) {
+            $sortBy = "name";
         }
 
         $users = $this->apiCache->rememberRequest(
@@ -139,16 +150,51 @@ class AdminController extends Controller
             ],
             $request,
             300,
-            function () use ($limit) {
-                return User::with(
+            function () use (
+                $perPage,
+                $search,
+                $role,
+                $page,
+                $sortBy,
+                $sortDirection,
+            ) {
+                $query = User::with(
                     "staff",
                     "staff.department",
                     "student.clearance_requests",
                     "student.department",
-                )
-                    ->latest()
-                    ->limit($limit)
-                    ->get();
+                );
+
+                if ($role !== "all") {
+                    $query->where("role", $role);
+                }
+
+                if ($search !== "") {
+                    $query->where(function ($q) use ($search) {
+                        $q->where("name", "like", "%{$search}%")
+                            ->orWhere("username", "like", "%{$search}%")
+                            ->orWhere("email", "like", "%{$search}%")
+                            ->orWhereHas("student", function ($studentQuery) use (
+                                $search,
+                            ) {
+                                $studentQuery->where(
+                                    "student_id",
+                                    "like",
+                                    "%{$search}%",
+                                );
+                            });
+                    });
+                }
+
+                if ($sortBy === "email") {
+                    $query->orderByRaw(
+                        "COALESCE(email, username, '') " . $sortDirection,
+                    );
+                } else {
+                    $query->orderBy($sortBy, $sortDirection);
+                }
+
+                return $query->paginate($perPage, ["*"], "page", $page);
             },
             "admin.users",
         );
@@ -385,6 +431,91 @@ class AdminController extends Controller
         );
 
         return response()->json($data);
+    }
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            "name" => "sometimes|string|max:255",
+            "username" => [
+                "sometimes",
+                "nullable",
+                "string",
+                "max:255",
+                Rule::unique("users", "username")->ignore($id),
+            ],
+            "email" => [
+                "sometimes",
+                "nullable",
+                "email",
+                "max:255",
+                Rule::unique("users", "email")->ignore($id),
+            ],
+            "role" =>
+                "sometimes|string|in:student,admin,department_head,library,cafeteria,proctor,registrar",
+            "student" => "sometimes|array",
+            "student.student_id" => "sometimes|string|max:255",
+            "student.year" => "sometimes|string|max:255",
+            "student.department_id" =>
+                "sometimes|nullable|exists:departments,id",
+            "staff" => "sometimes|array",
+            "staff.position" => "sometimes|string|max:255",
+            "staff.department_id" => "sometimes|nullable|exists:departments,id",
+            "staff.role" =>
+                "sometimes|string|in:department_head,library,cafeteria,proctor,registrar",
+        ]);
+
+        $user = User::with("student", "staff")->findOrFail($id);
+
+        foreach (["name", "username", "email", "role"] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $user->{$field} = $validated[$field];
+            }
+        }
+        $user->save();
+
+        if (isset($validated["student"]) && $user->student) {
+            $studentData = $validated["student"];
+            foreach (["student_id", "year", "department_id"] as $field) {
+                if (array_key_exists($field, $studentData)) {
+                    $user->student->{$field} = $studentData[$field];
+                }
+            }
+            $user->student->save();
+        }
+
+        if (isset($validated["staff"]) && $user->staff) {
+            $staffData = $validated["staff"];
+            foreach (["position", "department_id", "role"] as $field) {
+                if (array_key_exists($field, $staffData)) {
+                    $user->staff->{$field} = $staffData[$field];
+                }
+            }
+            $user->staff->save();
+        }
+
+        $this->apiCache->bump([
+            "admin_dashboard",
+            "admin_users",
+            "admin_departments",
+            "staff_students",
+            "staff_dashboard",
+            "users",
+            "students",
+            "staff",
+            "departments",
+            "clearance_requests",
+            "admin_clearance_requests",
+            "user:" . $user->id,
+        ]);
+
+        return response()->json([
+            "message" => "User updated successfully.",
+            "user" => $user->fresh([
+                "student.department",
+                "student.clearance_requests",
+                "staff.department",
+            ]),
+        ]);
     }
     public function resetPassword(Request $request, $id)
     {

@@ -56,7 +56,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/staff/dashboard', [StaffController::class, 'dashboard']);
     Route::get('/staff/profile/show', [StaffController::class, 'showProfile']);
     Route::get('/staff/displayRequests', [StaffController::class, 'displayRequests']);
+    Route::get('/staff/requests/{id}', [StaffController::class, 'showRequest']);
     Route::get('/staff/students', [StaffController::class, 'dispalyStudents']);
+    Route::get('/staff/me/{id}', [StaffController::class, 'showMe']);
 });
 
 Route::get('/Allclearance-requsets', [ClearanceRequestController::class, 'display']);

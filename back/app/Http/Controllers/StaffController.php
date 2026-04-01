@@ -240,6 +240,43 @@ class StaffController extends Controller
 
         return response()->json($data);
     }
+
+    public function showRequest(string $id)
+    {
+        $user = Auth::user();
+        if (!$user || !$user->staff) {
+            return response()->json(["message" => "Unauthorized"], 403);
+        }
+
+        $request = ClearanceRequest::with(
+            "student.user",
+            "student.department",
+            "department",
+        )->find($id);
+
+        if (!$request || $request->archived) {
+            return response()->json(["message" => "Clearance request not found"], 404);
+        }
+
+        if (
+            $user->role === "department_head" &&
+            (int) $request->department_id !== (int) $user->staff->department_id
+        ) {
+            return response()->json(["message" => "You can only access requests from your own department"], 403);
+        }
+
+        if (
+            $user->role !== "department_head" &&
+            $request->current_step !== $user->role &&
+            (!is_array($request->approvals) ||
+                ($request->approvals[$user->role]["status"] ?? "pending") === "pending")
+        ) {
+            return response()->json(["message" => "This request is not available for your role"], 403);
+        }
+
+        return response()->json($request);
+    }
+
     public function dispalyStudents()
     {
         $user = Auth::user();
@@ -286,5 +323,14 @@ class StaffController extends Controller
         );
 
         return response()->json($data["data"], $data["status"]);
+    }
+    public function showMe(string $id)
+    {
+        $user = Auth::user();
+        $staff = Staff::where("user_id", $id)->with("department")->first();
+        if (!$staff) {
+            return response()->json(["message" => "Staff not found"], 404);
+        }
+        return response()->json($staff);
     }
 }
