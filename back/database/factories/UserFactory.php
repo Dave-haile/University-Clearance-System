@@ -6,10 +6,6 @@ use App\HasRandomImages;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -67,7 +63,7 @@ class UserFactory extends Factory
     public function student()
     {
         return $this->state(fn() => [
-            'username' => 'INUSR' . rand(1000, 9999),
+            'username' => 'INUSR' . $this->faker->unique()->numerify('######'),
             'email' => null,
             'role' => 'student',
         ]);

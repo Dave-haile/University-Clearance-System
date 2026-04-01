@@ -79,6 +79,7 @@ class AdminController extends Controller
                         "pending" => (int) ($requestCounts["pending"] ?? 0),
                         "rejected" => (int) ($requestCounts["rejected"] ?? 0),
                     ],
+                    // limit 7 department
                     "byDepartment" => ClearanceRequest::where("archived", false)
                         ->join(
                             "departments",
@@ -249,7 +250,7 @@ class AdminController extends Controller
             return response()->json(
                 [
                     "message" =>
-                        "This department already exists in the selected college.",
+                    "This department already exists in the selected college.",
                 ],
                 400,
             );
@@ -425,7 +426,7 @@ class AdminController extends Controller
                 return [
                     "user" => $user,
                     "clearances" =>
-                        $user->student?->clearance_requests ?? collect(),
+                    $user->student?->clearance_requests ?? collect(),
                 ];
             },
         );
@@ -451,17 +452,17 @@ class AdminController extends Controller
                 Rule::unique("users", "email")->ignore($id),
             ],
             "role" =>
-                "sometimes|string|in:student,admin,department_head,library,cafeteria,proctor,registrar",
+            "sometimes|string|in:student,admin,department_head,library,cafeteria,proctor,registrar",
             "student" => "sometimes|array",
             "student.student_id" => "sometimes|string|max:255",
             "student.year" => "sometimes|string|max:255",
             "student.department_id" =>
-                "sometimes|nullable|exists:departments,id",
+            "sometimes|nullable|exists:departments,id",
             "staff" => "sometimes|array",
             "staff.position" => "sometimes|string|max:255",
             "staff.department_id" => "sometimes|nullable|exists:departments,id",
             "staff.role" =>
-                "sometimes|string|in:department_head,library,cafeteria,proctor,registrar",
+            "sometimes|string|in:department_head,library,cafeteria,proctor,registrar",
         ]);
 
         $user = User::with("student", "staff")->findOrFail($id);

@@ -18,9 +18,10 @@ class StudentFactory extends Factory
      */
     public function definition(): array
 {
-    $randId = rand(1000, 9999);
-    $randYear = rand(10, 25);
-    $studentId = 'INUSR/' . $randId . '/' . $randYear;
+    $studentId = 'INUSR/' .
+        $this->faker->unique()->numerify('####') .
+        '/' .
+        $this->faker->numberBetween(10, 30);
 
     return [
         'user_id' => User::factory()->student(),

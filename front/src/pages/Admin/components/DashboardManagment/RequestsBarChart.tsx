@@ -63,13 +63,15 @@ export const DepartmentPieChart: React.FC<{ data?: DepartmentStat[] }> = ({ data
         <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Unit Mapping</h2>
         <span className="text-[9px] font-black text-violet-500 bg-violet-50 px-2 py-0.5 rounded tracking-tighter uppercase">Active Depts</span>
       </div>
-      <div className="h-[200px] w-full">
+      <div className="h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
-              innerRadius={60}
-              outerRadius={80}
+              cx="50%"
+              cy="40%"
+              innerRadius={45}
+              outerRadius={65}
               paddingAngle={8}
               dataKey="total"
               nameKey="department"
@@ -80,7 +82,19 @@ export const DepartmentPieChart: React.FC<{ data?: DepartmentStat[] }> = ({ data
               ))}
             </Pie>
             <Tooltip contentStyle={{ backgroundColor: isDark ? '#0f172a' : '#ffffff', borderRadius: '12px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', fontSize: '11px', fontWeight: 'bold' }} />
-            <Legend verticalAlign="bottom" align="center" iconType="circle" wrapperStyle={{ fontSize: '9px', fontWeight: 800, paddingTop: '15px', textTransform: 'uppercase', letterSpacing: '0.05em' }} />
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              iconType="circle"
+              wrapperStyle={{
+                fontSize: '9px',
+                fontWeight: 800,
+                paddingTop: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                lineHeight: '1.4',
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>

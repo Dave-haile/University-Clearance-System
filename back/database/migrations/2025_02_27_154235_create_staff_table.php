@@ -14,8 +14,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('position');
             $table->string('phone_number')->nullable();
-            $table->foreignId('department_id')->nullable()->constrained()->onDelete('cascade')->change(); 
-            $table->enum('role', ['department_head', 'library', 'cafeteria', 'proctor', 'registrar'])->after('position');
+            $table->foreignId('department_id')->nullable()->constrained()->onDelete('cascade');
+            $table->enum('role', ['department_head', 'library', 'cafeteria', 'proctor', 'registrar']);
             $table->unique(['department_id', 'role'], 'unique_department_head')->where('role', 'department_head');
             $table->timestamps();
         });
