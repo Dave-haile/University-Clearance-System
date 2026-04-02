@@ -1,0 +1,92 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: clearance_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: clearance_db
+      POSTGRES_USER: clearance_user
+      POSTGRES_PASSWORD: clearance_pass
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - clearance_network
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: clearance_redis_dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - clearance_network
+
+  # Laravel Backend (Development)
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile.dev
+    container_name: clearance_backend_dev
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: clearance_db
+      DB_USERNAME: clearance_user
+      DB_PASSWORD: clearance_pass
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_URL: http://localhost:8000
+      CACHE_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - ./back:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - clearance_network
+    command: >
+      sh -c "composer install && 
+             php artisan migrate && 
+             php artisan db:seed && 
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+  # React Frontend (Development)
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile.dev
+    container_name: clearance_frontend_dev
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8000
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - clearance_network
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  postgres_data_dev:
+
+networks:
+  clearance_network:
+    driver: bridge

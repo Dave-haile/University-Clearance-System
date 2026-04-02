@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Composer
+vendor/
+composer.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Laravel specific
+node_modules/
+npm-debug.log
+yarn-error.log
+public/storage
+storage/*.key
+storage/app/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests
+tests/
+phpunit.xml
+
+# Documentation
+README.md
+docs/
+
+# Docker
+Dockerfile
+.dockerignore

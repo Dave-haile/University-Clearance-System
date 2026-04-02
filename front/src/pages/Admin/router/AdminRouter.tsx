@@ -12,6 +12,7 @@ import HelpPage from "../pages/HelpPage";
 import CreateUserPage from "../components/UserManagement/CreateUserPage";
 import UserReportsPage from "../components/UserManagement/UserReportsPage";
 import RequestReportsPage from "../components/ClearanceManagemnt/ClearanceRequestReportPage";
+import LogsPage from "../pages/LogsPage";
 
 const AdminRoutes = () => {
   return (
@@ -36,6 +37,7 @@ const AdminRoutes = () => {
           <Route path="requests/:id" element={<RequestDetailPage />} />
           <Route path="departments" element={<Departments />} />
           <Route path="departments/:id" element={<DepartmentDetailPage />} />
+          <Route path="logs" element={<LogsPage />} />
           <Route path="/reports/users" element={<UserReportsPage />} />
           <Route path="/reports/requests" element={<RequestReportsPage />} />
           {/* <Route path="/reports/departments" element={<LogsPage />} /> */}

@@ -1,0 +1,88 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: clearance_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: clearance_db
+      POSTGRES_USER: clearance_user
+      POSTGRES_PASSWORD: clearance_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./back/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - clearance_network
+
+  # Laravel Backend
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: clearance_backend
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: clearance_db
+      DB_USERNAME: clearance_user
+      DB_PASSWORD: clearance_pass
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: http://localhost:8000
+      SESSION_DRIVER: database
+      CACHE_DRIVER: database
+      QUEUE_CONNECTION: database
+    volumes:
+      - ./back/storage:/var/www/html/storage
+      - ./back/bootstrap/cache:/var/www/html/bootstrap/cache
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - clearance_network
+    command: >
+      sh -c "php artisan config:cache && 
+             php artisan migrate --force && 
+             php artisan db:seed --force && 
+             php artisan serve --host=0.0.0.0 --port=8000"
+
+  # Nginx for Laravel
+  nginx:
+    image: nginx:alpine
+    container_name: clearance_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./back:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - clearance_network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: clearance_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - clearance_network
+
+volumes:
+  postgres_data:
+
+networks:
+  clearance_network:
+    driver: bridge
