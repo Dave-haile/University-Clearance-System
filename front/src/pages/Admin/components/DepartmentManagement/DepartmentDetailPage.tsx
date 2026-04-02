@@ -64,14 +64,17 @@ const fetchDepartmentDetail = async (
     throw new Error("Department not found");
   }
 
-  const students = (usersResponse.data ?? []).filter(
+  // console.log(usersResponse.data.data);
+  const students = (usersResponse.data.data ?? []).filter(
     (user) => user.student?.department_id === department.id,
   );
 
+  console.log("students", students);
   const requests = (requestsResponse.data ?? []).filter(
     (request) => request.department?.id === department.id,
   );
 
+  console.log(department, students, requests);
   return {
     department,
     students,
@@ -159,9 +162,17 @@ const DepartmentDetailPage: React.FC = () => {
   }, [requests, searchTerm]);
 
   const totalPages = useMemo(() => {
-    const count = activeTab === 'students' ? filteredStudents.length : filteredRequests.length;
+    const count =
+      activeTab === "students"
+        ? filteredStudents.length
+        : filteredRequests.length;
     return Math.ceil(count / itemsPerPage);
-  }, [activeTab, filteredStudents.length, filteredRequests.length, itemsPerPage]);
+  }, [
+    activeTab,
+    filteredStudents.length,
+    filteredRequests.length,
+    itemsPerPage,
+  ]);
 
   const paginatedStudents = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -177,7 +188,6 @@ const DepartmentDetailPage: React.FC = () => {
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, activeTab]);
-
 
   if (isLoading) {
     return (
@@ -477,10 +487,11 @@ const DepartmentDetailPage: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${activeTab === tab.id
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest transition-all duration-300 ${
+                      activeTab === tab.id
                         ? "bg-white dark:bg-slate-900 text-indigo-600 shadow-xl shadow-indigo-100 dark:shadow-none"
                         : "text-slate-400 hover:text-slate-600"
-                      }`}
+                    }`}
                   >
                     <tab.icon className="w-3.5 h-3.5" />
                     {tab.label}
@@ -504,7 +515,7 @@ const DepartmentDetailPage: React.FC = () => {
             <div className="flex-1 p-6 overflow-y-auto scrollbar-hide">
               {activeTab === "students" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-fade-in">
-                  {paginatedStudents.map(stu => (
+                  {paginatedStudents.map((stu) => (
                     <div
                       key={stu.id}
                       className="p-5 bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 flex items-center justify-between group hover:border-indigo-500/30 transition-all hover:shadow-2xl hover:shadow-indigo-100/30 dark:hover:shadow-none"
@@ -559,10 +570,11 @@ const DepartmentDetailPage: React.FC = () => {
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-16 h-16 rounded-[22px] flex items-center justify-center border shadow-sm ${req.status === "approved"
+                          className={`w-16 h-16 rounded-[22px] flex items-center justify-center border shadow-sm ${
+                            req.status === "approved"
                               ? "bg-emerald-50 border-emerald-100 text-emerald-500 dark:bg-emerald-950/30"
                               : "bg-amber-50 border-amber-100 text-amber-500 dark:bg-amber-950/30"
-                            }`}
+                          }`}
                         >
                           {req.status === "approved" ? (
                             <CheckCircle className="w-8 h-8" />
@@ -591,10 +603,11 @@ const DepartmentDetailPage: React.FC = () => {
                             Audit Status
                           </p>
                           <span
-                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${req.status === "approved"
+                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                              req.status === "approved"
                                 ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/30"
                                 : "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/30"
-                              }`}
+                            }`}
                           >
                             {req.status}
                           </span>
@@ -727,22 +740,29 @@ const DepartmentDetailPage: React.FC = () => {
             </div>
 
             {/* Pagination Segment (Dynamic based on tab) */}
-            {activeTab !== 'analytics' && (
+            {activeTab !== "analytics" && (
               <div className="px-10 py-8 border-t border-slate-50 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/30 dark:bg-slate-800/10">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  Displaying Segment <span className="text-slate-900 dark:text-slate-100">{currentPage}</span> of <span className="text-slate-900 dark:text-slate-100">{totalPages || 1}</span>
+                  Displaying Segment{" "}
+                  <span className="text-slate-900 dark:text-slate-100">
+                    {currentPage}
+                  </span>{" "}
+                  of{" "}
+                  <span className="text-slate-900 dark:text-slate-100">
+                    {totalPages || 1}
+                  </span>
                 </p>
 
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                    {[20, 100, 500].map(size => (
+                    {[20, 100, 500].map((size) => (
                       <button
                         key={size}
                         onClick={() => {
                           setItemsPerPage(size);
                           setCurrentPage(1);
                         }}
-                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${itemsPerPage === size ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${itemsPerPage === size ? "bg-indigo-600 text-white shadow-md" : "text-slate-400 hover:text-slate-600"}`}
                       >
                         {size}
                       </button>
@@ -752,14 +772,14 @@ const DepartmentDetailPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(p => p - 1)}
+                      onClick={() => setCurrentPage((p) => p - 1)}
                       className="p-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-400 hover:text-indigo-600 disabled:opacity-30 transition-all shadow-sm"
                     >
                       <ArrowLeft className="w-4 h-4" />
                     </button>
                     <button
                       disabled={currentPage === totalPages || totalPages === 0}
-                      onClick={() => setCurrentPage(p => p + 1)}
+                      onClick={() => setCurrentPage((p) => p + 1)}
                       className="p-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl text-slate-400 hover:text-indigo-600 disabled:opacity-30 transition-all shadow-sm"
                     >
                       <ArrowRight className="w-4 h-4" />
