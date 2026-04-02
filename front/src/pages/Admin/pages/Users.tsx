@@ -127,6 +127,7 @@ const Users: React.FC = () => {
   if (error !== null) {
     toast.error(error);
   }
+  console.log(users);
 
   return (
     <div className="space-y-5 animate-fade-in">
@@ -243,6 +244,7 @@ const Users: React.FC = () => {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2.5">
                           <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white font-bold text-[11px] shadow-sm overflow-hidden">
+
                             {user.profile_image ? (
                               <img
                                 src={user.profile_image}
