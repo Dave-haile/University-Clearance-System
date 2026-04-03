@@ -21,6 +21,8 @@ import {
   ShieldCheck,
   CheckCircle,
   Loader2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -37,9 +39,8 @@ const UserDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
-    null,
-  );
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Using React Query as requested
   const { data, isLoading, isError, refetch } = useQuery({
@@ -67,32 +68,19 @@ const UserDetailPage: React.FC = () => {
     },
   });
 
-  const generateTemporaryPassword = () => {
-    const chars =
-      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
-    return Array.from({ length: 12 }, () =>
-      chars.charAt(Math.floor(Math.random() * chars.length)),
-    ).join("");
-  };
-
   const resetPasswordMutation = useMutation({
     mutationFn: async () => {
       if (!id || !user) {
         throw new Error("Missing user context");
       }
 
-      const temporaryPassword = generateTemporaryPassword();
-
       await resetUserPassword(id, {
         username: user.username || undefined,
         email: user.email || undefined,
-        password: temporaryPassword,
+        password: newPassword.trim(),
       });
-
-      return temporaryPassword;
     },
-    onSuccess: async (temporaryPassword) => {
-      setGeneratedPassword(temporaryPassword);
+    onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: queryKeys.admin.usersBase,
       });
@@ -101,30 +89,28 @@ const UserDetailPage: React.FC = () => {
           queryKey: queryKeys.admin.userDetail(id),
         });
       }
+      toast.success("Password updated successfully");
+      setShowResetConfirm(false);
+      setNewPassword("");
+      setShowPassword(false);
     },
   });
 
   const handleGeneratePassword = () => {
+    if (newPassword.trim().length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
     resetPasswordMutation.mutate();
   };
 
   const handleCloseResetModal = () => {
     if (!resetPasswordMutation.isPending) {
       setShowResetConfirm(false);
-      setGeneratedPassword(null);
+      setNewPassword("");
+      setShowPassword(false);
       resetPasswordMutation.reset();
-    }
-  };
-
-  const handleCopyPassword = async () => {
-    if (!generatedPassword) return;
-
-    try {
-      await navigator.clipboard.writeText(generatedPassword);
-      toast.success("Temporary password copied");
-    } catch (error) {
-      console.error("Failed to copy password:", error);
-      toast.error("Failed to copy password");
     }
   };
 
@@ -658,57 +644,66 @@ const UserDetailPage: React.FC = () => {
               <Key className="w-10 h-10 text-amber-500" />
             </div>
             <h3 className="text-2xl font-black text-slate-900 dark:text-slate-50 mb-3 tracking-tight">
-              {generatedPassword ? "Temporary Password Ready" : "Rotate Credentials?"}
+              Set New Password
             </h3>
-            {generatedPassword ? (
-              <div className="mb-8 space-y-4">
-                <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                  The old password has been replaced. Share this temporary
-                  password securely with{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {user.name}
-                  </span>
-                  .
-                </p>
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                    Temporary Password
-                  </p>
-                  <p className="break-all font-mono text-lg font-bold text-slate-900 dark:text-slate-100">
-                    {generatedPassword}
-                  </p>
-                </div>
+            <p className="text-slate-500 dark:text-slate-400 mb-6 leading-relaxed font-medium">
+              Enter the new password you want to assign to{" "}
+              <span className="font-bold text-slate-900 dark:text-slate-100">
+                {user.name}
+              </span>
+              . This will replace the current password immediately.
+            </p>
+            <div className="mb-8 text-left">
+              <label
+                htmlFor="manual-password"
+                className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400"
+              >
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  id="manual-password"
+                  type={showPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  disabled={resetPasswordMutation.isPending}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm font-medium text-slate-900 outline-none transition-all focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100"
+                  placeholder="Enter a new password"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-            ) : (
-              <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed font-medium">
-                A temporary password will be generated for{" "}
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {user.name}
-                </span>
-                . The existing password will be instantly invalidated.
+              <p className="mt-2 text-xs font-medium text-slate-400">
+                Use at least 8 characters.
               </p>
-            )}
+            </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleCloseResetModal}
                 disabled={resetPasswordMutation.isPending}
                 className="flex-1 px-8 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-200 active:scale-95"
               >
-                {generatedPassword ? "Close" : "Abort Reset"}
+                Cancel
               </button>
               <button
-                onClick={
-                  generatedPassword ? handleCopyPassword : handleGeneratePassword
-                }
+                onClick={handleGeneratePassword}
                 disabled={resetPasswordMutation.isPending}
                 className="flex-1 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl text-sm font-bold text-white shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {resetPasswordMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : generatedPassword ? (
-                  "Copy Password"
                 ) : (
-                  "Generate New"
+                  "Update Password"
                 )}
               </button>
             </div>
