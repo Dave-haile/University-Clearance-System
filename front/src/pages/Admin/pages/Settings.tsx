@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { PageHeader } from "../components/layout/PageHeader";
 import { useAuth } from "../../../context/authContext";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import {
   Avatar,
   AvatarFallback,

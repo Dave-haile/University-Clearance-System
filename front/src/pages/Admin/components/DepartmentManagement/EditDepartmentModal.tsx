@@ -10,7 +10,7 @@ import {
 import { Button } from "../../../../components/ui/button";
 import { Label } from "../../../../components/ui/label";
 import { Department } from "../../../../types/department";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 interface EditDepartmentModalProps {
   department: Department | null;

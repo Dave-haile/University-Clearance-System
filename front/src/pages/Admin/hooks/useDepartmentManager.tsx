@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import {
   Department,
   DepartmentFilter,

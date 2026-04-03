@@ -3,7 +3,7 @@ import { useAuth } from "@/context/authContext";
 import { User, Bell, ChevronRight, Menu } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 export const Header = () => {
   const { user, logout } = useAuth();

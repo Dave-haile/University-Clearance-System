@@ -1,7 +1,7 @@
 import axiosClient from "@/services/axiosBackend";
 import { queryClient } from "@/lib/queryClient";
 import { queryKeys } from "@/lib/queryKeys";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 export const HandleApproval = async (
   id: number,

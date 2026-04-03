@@ -145,7 +145,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Check, Loader2 } from "lucide-react";
 import { Card, CardContent } from "../../ui/card";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import axiosClient from "../../../services/axiosBackend";
 import { Label } from "../../ui/label";
 import CollegeDepartmentSelect from "../../../pages/Admin/components/DepartmentManagement/DepartmentCollegeFetch";

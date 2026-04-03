@@ -22,7 +22,7 @@ import {
   Calendar
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import axiosClient from "@/services/axiosBackend";
 import { User } from "@/types/user";
 import axios from "axios";

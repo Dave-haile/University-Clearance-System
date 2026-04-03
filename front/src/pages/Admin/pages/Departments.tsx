@@ -16,7 +16,7 @@ import axiosClient from "@/services/axiosBackend";
 import { queryKeys } from "@/lib/queryKeys";
 import { queryClient } from "@/lib/queryClient";
 import { Department } from "@/types/department";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 type DepartmentResponse = {
   departments: Department[];

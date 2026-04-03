@@ -38,7 +38,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/pages/Admin/lib/utils";
 import axiosClient from "@/services/axiosBackend";
 import axios from "axios";

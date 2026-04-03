@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "../../../../components/ui/dialog";
 import { Edit, Trash2, Key, Lock } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { FilterOption, User } from "../../../../types/user";
 
 interface UserDataGridProps {

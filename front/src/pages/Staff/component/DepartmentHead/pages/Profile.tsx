@@ -19,7 +19,7 @@ import {
   Upload,
   RefreshCcw,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import axiosClient from "@/services/axiosBackend";
 import { User } from "@/types/user";
 import { getFullMemberSinceDate } from "@/pages/Admin/utils/formatDate";

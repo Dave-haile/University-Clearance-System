@@ -25,8 +25,8 @@ class StaffTableSeeder extends Seeder
             [
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Jane Smith',
-                    'email' => 'hello@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'email' => 'library@gmail.com',
+                    'password' => Hash::make('password'),
                     'role' => 'library',
                     'profile_image' => $imageUrl,
                 ]),
@@ -37,8 +37,8 @@ class StaffTableSeeder extends Seeder
             [
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Mike Johnson',
-                    'email' => 'byee@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'email' => 'cafeteria@gmail.com',
+                    'password' => Hash::make('password'),
                     'role' => 'cafeteria',
                     'profile_image' => $imageUrl,
                 ]),
@@ -49,8 +49,8 @@ class StaffTableSeeder extends Seeder
             [
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Sarah Brown',
-                    'email' => 'heylo@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'email' => 'proctor@gmail.com',
+                    'password' => Hash::make('password'),
                     'role' => 'proctor',
                     'profile_image' => $imageUrl,
                 ]),
@@ -61,8 +61,8 @@ class StaffTableSeeder extends Seeder
             [
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Emily Davis',
-                    'email' => 'emil@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'email' => 'registrar@gmail.com',
+                    'password' => Hash::make('password'),
                     'role' => 'registrar',
                     'profile_image' => $imageUrl,
                 ]),
@@ -74,7 +74,7 @@ class StaffTableSeeder extends Seeder
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'David Wilson',
                     'email' => 'david@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make('password'),
                     'role' => 'library',
                     'profile_image' => $imageUrl,
                 ]),
@@ -86,7 +86,7 @@ class StaffTableSeeder extends Seeder
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'John Doe',
                     'email' => 'does@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make('password'),
                     'role' => 'cafeteria',
                     'profile_image' => $imageUrl,
                 ]),
@@ -98,7 +98,7 @@ class StaffTableSeeder extends Seeder
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Alice Green',
                     'email' => 'green@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make('password'),
                     'role' => 'proctor',
                     'profile_image' => $imageUrl,
                 ]),
@@ -110,7 +110,7 @@ class StaffTableSeeder extends Seeder
                 'user_id' => DB::table('users')->insertGetId([
                     'name' => 'Chris White',
                     'email' => 'chris@gmail.com',
-                    'password' => Hash::make('password123'),
+                    'password' => Hash::make('password'),
                     'role' => 'registrar',
                     'profile_image' => $imageUrl,
                 ]),

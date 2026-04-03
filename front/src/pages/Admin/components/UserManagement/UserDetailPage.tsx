@@ -23,15 +23,23 @@ import {
   Loader2,
 } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteUser, fetchUserDetail } from "../../services/userDetailService";
+import {
+  deleteUser,
+  fetchUserDetail,
+  resetUserPassword,
+} from "../../services/userDetailService";
 import { queryKeys } from "@/lib/queryKeys";
 import { queryClient } from "@/lib/queryClient";
+import { toast } from "@/components/ui/use-toast";
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(
+    null,
+  );
 
   // Using React Query as requested
   const { data, isLoading, isError, refetch } = useQuery({
@@ -58,6 +66,67 @@ const UserDetailPage: React.FC = () => {
       navigate("/admin/users");
     },
   });
+
+  const generateTemporaryPassword = () => {
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+    return Array.from({ length: 12 }, () =>
+      chars.charAt(Math.floor(Math.random() * chars.length)),
+    ).join("");
+  };
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async () => {
+      if (!id || !user) {
+        throw new Error("Missing user context");
+      }
+
+      const temporaryPassword = generateTemporaryPassword();
+
+      await resetUserPassword(id, {
+        username: user.username || undefined,
+        email: user.email || undefined,
+        password: temporaryPassword,
+      });
+
+      return temporaryPassword;
+    },
+    onSuccess: async (temporaryPassword) => {
+      setGeneratedPassword(temporaryPassword);
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.admin.usersBase,
+      });
+      if (id) {
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.admin.userDetail(id),
+        });
+      }
+    },
+  });
+
+  const handleGeneratePassword = () => {
+    resetPasswordMutation.mutate();
+  };
+
+  const handleCloseResetModal = () => {
+    if (!resetPasswordMutation.isPending) {
+      setShowResetConfirm(false);
+      setGeneratedPassword(null);
+      resetPasswordMutation.reset();
+    }
+  };
+
+  const handleCopyPassword = async () => {
+    if (!generatedPassword) return;
+
+    try {
+      await navigator.clipboard.writeText(generatedPassword);
+      toast.success("Temporary password copied");
+    } catch (error) {
+      console.error("Failed to copy password:", error);
+      toast.error("Failed to copy password");
+    }
+  };
 
   const { user, clearances } = data || {};
 
@@ -582,34 +651,65 @@ const UserDetailPage: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
-            onClick={() => setShowResetConfirm(false)}
+            onClick={handleCloseResetModal}
           />
           <div className="bg-white dark:bg-slate-900 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-2xl p-10 max-w-md w-full relative z-10 animate-fade-in text-center">
             <div className="w-20 h-20 rounded-3xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center mb-8 mx-auto border border-amber-100 dark:border-amber-900/20">
               <Key className="w-10 h-10 text-amber-500" />
             </div>
             <h3 className="text-2xl font-black text-slate-900 dark:text-slate-50 mb-3 tracking-tight">
-              Rotate Credentials?
+              {generatedPassword ? "Temporary Password Ready" : "Rotate Credentials?"}
             </h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed font-medium">
-              A temporary password will be generated for{" "}
-              <span className="font-bold text-slate-900 dark:text-slate-100">
-                {user.name}
-              </span>
-              . The existing password will be instantly invalidated.
-            </p>
+            {generatedPassword ? (
+              <div className="mb-8 space-y-4">
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  The old password has been replaced. Share this temporary
+                  password securely with{" "}
+                  <span className="font-bold text-slate-900 dark:text-slate-100">
+                    {user.name}
+                  </span>
+                  .
+                </p>
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-5">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                    Temporary Password
+                  </p>
+                  <p className="break-all font-mono text-lg font-bold text-slate-900 dark:text-slate-100">
+                    {generatedPassword}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-slate-500 dark:text-slate-400 mb-10 leading-relaxed font-medium">
+                A temporary password will be generated for{" "}
+                <span className="font-bold text-slate-900 dark:text-slate-100">
+                  {user.name}
+                </span>
+                . The existing password will be instantly invalidated.
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => setShowResetConfirm(false)}
+                onClick={handleCloseResetModal}
+                disabled={resetPasswordMutation.isPending}
                 className="flex-1 px-8 py-4 bg-slate-100 dark:bg-slate-800 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-200 active:scale-95"
               >
-                Abort Reset
+                {generatedPassword ? "Close" : "Abort Reset"}
               </button>
               <button
-                onClick={() => setShowResetConfirm(false)}
-                className="flex-1 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl text-sm font-bold text-white shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
+                onClick={
+                  generatedPassword ? handleCopyPassword : handleGeneratePassword
+                }
+                disabled={resetPasswordMutation.isPending}
+                className="flex-1 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl text-sm font-bold text-white shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Generate New
+                {resetPasswordMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : generatedPassword ? (
+                  "Copy Password"
+                ) : (
+                  "Generate New"
+                )}
               </button>
             </div>
           </div>

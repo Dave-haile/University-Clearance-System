@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { PlusIcon, UserRoundIcon } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 
 export interface SendtoDepartmentCreationProps {
     department: string,

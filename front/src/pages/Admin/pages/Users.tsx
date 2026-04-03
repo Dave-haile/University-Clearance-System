@@ -17,7 +17,7 @@ import {
 import { User } from "@/types";
 import CreateUserDialog from "../components/UserManagement/CreateUserDialog";
 import axiosClient from "@/services/axiosBackend";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 
 type SortField = "name" | "email" | "created_at";

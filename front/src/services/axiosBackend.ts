@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AUTH_LOGOUT_EVENT } from "@/context/authEvents";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 const axiosClient = axios.create({
@@ -28,7 +29,7 @@ axiosClient.interceptors.response.use(
       console.log("Unauthorized! Clearing token...");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      window.dispatchEvent(new Event(AUTH_LOGOUT_EVENT));
     }
     return Promise.reject(error);
   },

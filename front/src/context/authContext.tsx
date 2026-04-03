@@ -7,8 +7,11 @@ import {
 } from "react";
 import { User } from "../types/user";
 import axiosClient from "@/services/axiosBackend";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { AUTH_LOGOUT_EVENT } from "./authEvents";
+
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -24,6 +27,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigator = useNavigate();
+
+  const clearSession = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    queryClient.clear();
+  };
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -36,6 +48,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    const handleForcedLogout = () => {
+      clearSession();
+      navigator("/login", { replace: true });
+    };
+
+    window.addEventListener(AUTH_LOGOUT_EVENT, handleForcedLogout);
+
+    return () => {
+      window.removeEventListener(AUTH_LOGOUT_EVENT, handleForcedLogout);
+    };
+  }, [navigator, queryClient]);
+
   const login = (user: User, token: string) => {
     queryClient.clear();
     setUser(user);
@@ -45,17 +70,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    queryClient.clear();
+    let logoutMessage = "Logged out successfully";
+
     try {
       const response = await axiosClient.post("/logout");
-      toast.success(response.data.message || "Looged out Successfully");
+      logoutMessage = response.data.message || logoutMessage;
     } catch (error) {
-      toast.error("Logging out was not successful try again later");
       console.log(error);
+    } finally {
+      clearSession();
+      navigator("/login", { replace: true });
+      toast.success(logoutMessage);
     }
   };
 

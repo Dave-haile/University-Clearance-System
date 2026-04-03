@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../../components/ui/select";
-import { useToast } from "../../hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { updateUser } from "../../services/userDetailService";
 import { useMutation, } from "@tanstack/react-query";
 import { User } from "../../../../types/index";

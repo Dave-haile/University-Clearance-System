@@ -42,13 +42,14 @@ export const updateUser = async (
 export const resetUserPassword = async (
   userId: string,
   credentials: { username?: string; email?: string; password: string },
-): Promise<{ success: boolean }> => {
+): Promise<{ success: boolean; message?: string }> => {
   try {
-    console.log(credentials);
-    await axiosClient.put(`/admin/users/${userId}/reset-password`, credentials);
-    console.log("Reset password for user:", userId, credentials);
-    notifySuccess("Password reset successfully!");
-    return { success: true };
+    const response = await axiosClient.put(
+      `/admin/users/${userId}/reset-password`,
+      credentials,
+    );
+    notifySuccess(response.data.message || "Password reset successfully!");
+    return { success: true, message: response.data.message };
   } catch (error) {
     console.error("Error resetting password:", error);
     notifyError("Failed to reset password.");

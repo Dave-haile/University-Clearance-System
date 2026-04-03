@@ -29,7 +29,7 @@ import axiosClient from "@/services/axiosBackend";
 import type { Department } from "@/types/department";
 import type { User } from "@/types/user";
 import type { ClearanceRequests } from "@/types/clerance";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 type DepartmentDisplayResponse = {

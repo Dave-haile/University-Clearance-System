@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import LoginExample from "../components/Login/Example";
 import Unauthorized from "../pages/Other/Unauthorized";
 import ProtectedRoute from "./ProtectedRoute";
 import NotFound from "../Moke/NotFound";
@@ -9,13 +8,14 @@ import AdminRoutes from "../pages/Admin/router/AdminRouter";
 import CreateNewCollegeDepartment from "../pages/Admin/components/DepartmentManagement/CreatNewCollegeDepartment";
 import StudentRouter from "@/pages/Student/router/StudentRouter";
 import StaffRouter from "@/pages/Staff/router/StaffRouter";
+import Login from "@/components/Login/Login";
 // import Toast from "../Moke/toast";
 
 function AppRouter() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/login" element={<LoginExample />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/" element={<GuestLayout />} />
       <Route path="/about" element={<CreateNewCollegeDepartment />} />
