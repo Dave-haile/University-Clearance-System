@@ -1,21 +1,33 @@
-# 🎓 University Clearance Management System
+# 🎓 University Clearance Management System (Version 2)
 
-A full-stack web application designed to digitize and streamline the university clearance process. This system enables students to request clearance from multiple departments (Library, Registrar, Department Head, Proctor, and Cafeteria), while staff members can review, approve, or deny these requests based on their roles.
+A **completely redesigned** full-stack web application that digitizes and streamlines the university clearance process with enhanced user experience, modern UI/UX, and improved functionality. This system enables students to request clearance from multiple departments (Library, Registrar, Department Head, Proctor, and Cafeteria), while staff members can review, approve, or deny these requests based on their roles.
 
 ---
 
 ## 🚀 Features
 
-- 🔑 **Role-based login and redirection** (Student, Admin, Registrar, Department Head, Library, Proctor, Cafeteria)
-- 📝 **Student clearance request submission**
-- 📊 **Staff dashboards** for reviewing and managing requests
-- ⏱️ **Real-time clearance status tracking**
-- 🔒 **Token-based authentication** with protected routes
-- 📱 **Fully responsive and accessible UI**
+- 🔑 **Enhanced role-based login and redirection** with improved authentication flow (Student, Admin, Registrar, Department Head, Library, Proctor, Cafeteria)
+- 📝 **Streamlined student clearance request submission** with intuitive form design
+- 📊 **Redesigned staff dashboards** with better data visualization and management tools
+- ⏱️ **Real-time clearance status tracking** with live updates
+- 🔒 **Improved token-based authentication** with enhanced security measures
+- 📱 **Completely responsive and modern UI** with better accessibility and user experience
 
 ---
 
-## 🛠️ Tech Stack
+## � What's New in Version 2
+
+- 🎨 **Complete UI/UX redesign** with modern design patterns and improved user flow
+- 📱 **Enhanced mobile responsiveness** and better cross-device compatibility
+- 🔧 **Improved backend architecture** with optimized database queries and API performance
+- 🎯 **Better user onboarding** with clearer navigation and instructions
+- 🛡️ **Enhanced security measures** and improved authentication system
+- 📊 **Advanced dashboard analytics** with better data visualization
+- ⚡ **Performance optimizations** for faster load times and smoother interactions
+
+---
+
+## �🛠️ Tech Stack
 
 ### Frontend
 
@@ -121,6 +133,8 @@ php artisan serve
 👉 The backend will be available at: `http://localhost:8000`
 👉 The frontend will be available at: `http://localhost:5173`
 
+🌐 **Live Demo**: View the live application at [https://university-clearance-system.vercel.app](https://university-clearance-system.vercel.app)
+
 # Login as Admin using
 
 username "admin@university.com"
@@ -139,31 +153,48 @@ Explore role-based dashboards:
 
 # Landing Page
 
-![Landing-Page](docs/images/Screenshot_2025-09-10_154502.png)
+![Landing-Page](docs/images/Screenshot%202026-04-06%20115732.png)
 
 # Admin Dashboard
 
-![Admin-Dashboard-1](docs/images/Screenshot_2025-09-10_151145.png)
-![Admin-Dashboard-2](docs/images/Screenshot_2025-09-10_151349.png)
-![Admin-Dashboard-3](docs/images/Screenshot_2025-09-10_151435.png)
+![Admin-Dashboard-1](docs/images/Screenshot%202026-04-06%20115753.png)
+![Admin-Dashboard-2](docs/images/Screenshot%202026-04-06%20115805.png)
+![Admin-Dashboard-3](docs/images/Screenshot%202026-04-06%20115813.png)
+![Admin-Dashboard-4](docs/images/Screenshot%202026-04-06%20115819.png)
+![Admin-Dashboard-5](docs/images/Screenshot%202026-04-06%20115833.png)
 
 # Student Dashboard
 
-![Student-Dashboard-1](docs/images/Screenshot_2025-09-10_153810.png)
-![Student-Dashboard-2](docs/images/Screenshot_2025-09-10_150937.png)
+![Student-Dashboard-1](docs/images/Screenshot%202026-04-06%20120532.png)
+![Student-Dashboard-2](docs/images/Screenshot%202026-04-06%20120541.png)
+![Student-Dashboard-2](docs/images/Screenshot%202026-04-06%20120547.png)
+![Student-Dashboard-2](docs/images/Screenshot%202026-04-06%20120559.png)
 
 # Department Head Panel
 
-![Department-Head-1](docs/images/Screenshot_2025-09-10_153810.png)
-![Department-Head-2](docs/images/Screenshot_2025-09-10_150937.png)
+![Department-Head-1](docs/images/Screenshot%202026-04-06%20120331.png)
+![Department-Head-2](docs/images/Screenshot%202026-04-06%20120339.png)
+![Department-Head-3](docs/images/Screenshot%202026-04-06%20120345.png)
 
 Registrar Panel
 
+![Registrar-1](docs/images/Screenshot%202026-04-06%20130026.png)
+![Registrar-2](docs/images/Screenshot%202026-04-06%20130040.png)
+
 Library Panel
+
+![Library-1](docs/images/Screenshot%202026-04-06%20121138.png)
+![Library-2](docs/images/Screenshot%202026-04-06%20121146.png)
 
 Proctor Panel
 
+![Proctor-1](docs/images/Screenshot%202026-04-06%20130200.png)
+![Proctor-2](docs/images/Screenshot%202026-04-06%20130207.png)
+
 Cafeteria Panel
+
+![Cafeteria-1](docs/images/Screenshot%202026-04-06%20130257.png)
+![Cafeteria-2](docs/images/Screenshot%202026-04-06%20130303.png)
 
 👨‍💻 Author
 Dawit Haile Sebho
@@ -180,13 +211,20 @@ Computer Science Student @ Injibara University
 
 🌍 Multilingual support (Amharic & English)
 
-🙌 Acknowledgements
+🔄 Integration with university student information system
+
+� Mobile app development for iOS and Android
+
+�� Acknowledgements
 Special thanks to our instructors, mentors, and teammates for their support and valuable feedback throughout the project.
 
 ---
 
-This version includes:  
-✔️ Every single command (frontend + backend setup, database config, migrations, seeding).  
-✔️ Clear instructions on what URL to open for both frontend & backend.  
-✔️ PostgreSQL `.env` example filled out.  
-✔️ Professional formatting and emojis for readability.
+This version 2 includes:  
+✔️ **Complete UI/UX overhaul** with modern design principles  
+✔️ **Enhanced performance** and optimized backend architecture  
+✔️ **Improved user experience** with better navigation and workflows  
+✔️ **Enhanced security features** and authentication system  
+✔️ **Better mobile responsiveness** and cross-device compatibility  
+✔️ **Advanced dashboard features** with improved data visualization  
+✔️ **Live deployment** at https://university-clearance-system.vercel.app
